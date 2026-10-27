@@ -121,19 +121,25 @@ function Explore() {
               <div className="bird-left">
                 <span className="bird-tag">{b.type}</span>
                 {b.image_url && (
-                  <img
-                    src={getImageUrl(b.image_url)}
-                    alt={b.name}
-                    className="bird-img"
-                    onError={(e) => {
-                      const filename = b.image_url ? b.image_url.split('/').pop() : '';
-                      if (filename && !e.target.src.endsWith('/species/' + filename)) {
-                        e.target.src = `/species/${filename}`;
-                      } else {
-                        e.target.style.display = 'none';
-                      }
-                    }}
-                  />
+                  <>
+                    <div
+                      className="bird-backdrop"
+                      style={{ backgroundImage: `url(${getImageUrl(b.image_url)})` }}
+                    />
+                    <img
+                      src={getImageUrl(b.image_url)}
+                      alt={b.name}
+                      className="bird-img"
+                      onError={(e) => {
+                        const filename = b.image_url ? b.image_url.split('/').pop() : '';
+                        if (filename && !e.target.src.endsWith('/species/' + filename)) {
+                          e.target.src = `/species/${filename}`;
+                        } else {
+                          e.target.style.display = 'none';
+                        }
+                      }}
+                    />
+                  </>
                 )}
               </div>
               <div className="bird-content">
@@ -143,10 +149,10 @@ function Explore() {
                 <div className="bird-quick-stats">
                   <span className="stat-pill">⏳ <strong>Lifespan:</strong> {b.lifespan || "Varies"}</span>
                   {b.habitat && (
-                    <span className="stat-pill">🌿 <strong>Habitat:</strong> {b.habitat.length > 45 ? b.habitat.substring(0, 45) + "..." : b.habitat}</span>
+                    <span className="stat-pill">🌿 <strong>Habitat:</strong> {b.habitat.length > 40 ? b.habitat.substring(0, 40) + "..." : b.habitat}</span>
                   )}
                 </div>
-                <p className="fun-fact">🪶 {b.fun_facts ? (b.fun_facts.length > 130 ? b.fun_facts.substring(0, 130) + "..." : b.fun_facts) : "Gentle companion bird."}</p>
+                <p className="fun-fact">🪶 {b.fun_facts ? (b.fun_facts.length > 120 ? b.fun_facts.substring(0, 120) + "..." : b.fun_facts) : "Gentle companion bird."}</p>
                 <div className="bird-btn-row">
                   <button
                     className="btn-soft"
@@ -177,17 +183,23 @@ function Explore() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setSelectedSpecies(null)}>×</button>
             {selectedSpecies.image_url && (
-              <img
-                src={getImageUrl(selectedSpecies.image_url)}
-                alt={selectedSpecies.name}
-                className="modal-header-img"
-                onError={(e) => {
-                  const filename = selectedSpecies.image_url ? selectedSpecies.image_url.split('/').pop() : '';
-                  if (filename && !e.target.src.endsWith('/species/' + filename)) {
-                    e.target.src = `/species/${filename}`;
-                  }
-                }}
-              />
+              <div className="modal-header-frame">
+                <div
+                  className="modal-header-backdrop"
+                  style={{ backgroundImage: `url(${getImageUrl(selectedSpecies.image_url)})` }}
+                />
+                <img
+                  src={getImageUrl(selectedSpecies.image_url)}
+                  alt={selectedSpecies.name}
+                  className="modal-header-img"
+                  onError={(e) => {
+                    const filename = selectedSpecies.image_url ? selectedSpecies.image_url.split('/').pop() : '';
+                    if (filename && !e.target.src.endsWith('/species/' + filename)) {
+                      e.target.src = `/species/${filename}`;
+                    }
+                  }}
+                />
+              </div>
             )}
             <div className="modal-body">
               <div className="modal-title-row">

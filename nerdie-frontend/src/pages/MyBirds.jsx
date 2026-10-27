@@ -109,9 +109,6 @@ function MyBirds() {
   function handleCloseModal() {
     setIsModalOpen(false);
     setEditingBird(null);
-    if (prefillSpeciesId) {
-      setSearchParams({});
-    }
   }
 
   async function handleSaveBird(e) {
@@ -122,26 +119,23 @@ function MyBirds() {
     }
 
     setSaving(true);
-    try {
-      const payload = {
-        name: formName.trim(),
-        species_id: formSpeciesId ? parseInt(formSpeciesId, 10) : null,
-        age: formAge.trim(),
-        notes: formNotes.trim()
-      };
+    const payload = {
+      name: formName.trim(),
+      species_id: formSpeciesId ? parseInt(formSpeciesId, 10) : null,
+      age: formAge.trim(),
+      notes: formNotes.trim()
+    };
 
+    try {
       if (editingBird) {
-        // Update existing bird
-        const updated = await updateMyBird(editingBird.id, payload);
-        setBirds((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
-        showToastMessage(`Successfully updated profile for ${updated.name}!`);
+        await updateMyBird(editingBird.id, payload);
+        showToastMessage(`Updated ${formName}'s information successfully!`);
       } else {
-        // Create new bird
-        const created = await createMyBird(payload);
-        setBirds((prev) => [created, ...prev]);
-        showToastMessage(`Successfully added ${created.name} to your flock!`);
+        await createMyBird(payload);
+        showToastMessage(`Welcome ${formName} to your flock!`);
       }
       handleCloseModal();
+      await loadAllData();
     } catch (err) {
       alert(`Error saving bird: ${err.message}`);
     } finally {
@@ -210,15 +204,21 @@ function MyBirds() {
               const displayImage = bird.species_image ? getImageUrl(bird.species_image) : mascot;
               return (
                 <div className="user-bird-card" key={bird.id}>
-                  <img
-                    src={displayImage}
-                    alt={bird.name}
-                    className="user-bird-img"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = mascot;
-                    }}
-                  />
+                  <div className="user-bird-img-frame">
+                    <div
+                      className="user-bird-img-backdrop"
+                      style={{ backgroundImage: `url(${displayImage})` }}
+                    />
+                    <img
+                      src={displayImage}
+                      alt={bird.name}
+                      className="user-bird-img"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = mascot;
+                      }}
+                    />
+                  </div>
                   <div className="user-bird-body">
                     <div className="user-bird-title-row">
                       <h3>{bird.name}</h3>
@@ -355,6 +355,7 @@ function MyBirds() {
           </div>
         </div>
       )}
+
       {/* Gemini AI Bonding Tip Modal */}
       {bondingTipData && (
         <div className="crud-modal-overlay" onClick={() => setBondingTipData(null)}>

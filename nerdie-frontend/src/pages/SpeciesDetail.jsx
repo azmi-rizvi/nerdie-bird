@@ -53,11 +53,23 @@ function SpeciesDetail() {
 
       <div className="species-card">
         {species.image_url && (
-          <img
-            src={getImageUrl(species.image_url)}
-            alt={species.name}
-            className="species-banner-img"
-          />
+          <div className="species-hero-frame">
+            <div
+              className="species-hero-backdrop"
+              style={{ backgroundImage: `url(${getImageUrl(species.image_url)})` }}
+            />
+            <img
+              src={getImageUrl(species.image_url)}
+              alt={species.name}
+              className="species-hero-img"
+              onError={(e) => {
+                const filename = species.image_url ? species.image_url.split('/').pop() : '';
+                if (filename && !e.target.src.endsWith('/species/' + filename)) {
+                  e.target.src = `/species/${filename}`;
+                }
+              }}
+            />
+          </div>
         )}
 
         <div className="species-content">

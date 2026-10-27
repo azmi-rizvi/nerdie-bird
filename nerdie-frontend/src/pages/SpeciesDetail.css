@@ -27,11 +27,41 @@
   border-top: 5px solid var(--red);
 }
 
-.species-banner-img {
+/* Ambient framed hero showcase - displays full bird without any cropping */
+.species-hero-frame {
+  position: relative;
   width: 100%;
   height: 380px;
-  object-fit: cover;
-  background-color: var(--yellow-light);
+  background: #f6f2ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(74, 55, 40, 0.08);
+}
+
+.species-hero-backdrop {
+  position: absolute;
+  inset: -25px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(28px) brightness(0.95);
+  opacity: 0.38;
+  transform: scale(1.15);
+  pointer-events: none;
+}
+
+.species-hero-img {
+  position: relative;
+  z-index: 2;
+  max-height: 350px;
+  max-width: 92%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(40, 25, 15, 0.16);
+  display: block;
 }
 
 .species-content {
@@ -104,13 +134,16 @@
 }
 
 @media (max-width: 650px) {
+  .species-hero-frame {
+    height: 260px;
+  }
+  .species-hero-img {
+    max-height: 235px;
+  }
   .species-sections {
     grid-template-columns: 1fr;
   }
   .species-content {
     padding: 24px 20px;
-  }
-  .species-banner-img {
-    height: 240px;
   }
 }

@@ -41,11 +41,46 @@
   box-shadow: 0 10px 24px rgba(74, 55, 40, 0.1);
 }
 
-.user-bird-img {
+/* Ambient framed bird showcase - never cuts off birds */
+.user-bird-img-frame {
+  position: relative;
   width: 100%;
-  height: 180px;
-  object-fit: cover;
-  background-color: var(--yellow-light);
+  height: 200px;
+  background: #f6f2ec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(74, 55, 40, 0.08);
+}
+
+.user-bird-img-backdrop {
+  position: absolute;
+  inset: -20px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(22px) brightness(0.95);
+  opacity: 0.35;
+  transform: scale(1.15);
+  pointer-events: none;
+}
+
+.user-bird-img {
+  position: relative;
+  z-index: 2;
+  max-height: 180px;
+  max-width: 90%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(40, 25, 15, 0.14);
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.user-bird-card:hover .user-bird-img {
+  transform: scale(1.04);
 }
 
 .user-bird-body {
