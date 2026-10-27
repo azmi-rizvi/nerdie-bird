@@ -1,0 +1,67 @@
+.ihero {
+  background: var(--yellow-light);
+  padding: 55px 20px;
+  text-align: center;
+}
+
+.ihero h1 { color: var(--brown); font-size: 34px; }
+.ihero p { color: var(--brown-soft); }
+
+.symptom {
+  background-color: var(--white);
+  max-width: 620px;
+  margin: 50px auto;
+  padding: 36px;
+  text-align: center;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.symptom h2 { color: var(--brown); }
+
+.symptom input, .symptom select {
+  padding: 12px;
+  margin: 8px;
+  border: 2px solid var(--yellow-light);
+  border-radius: 10px;
+  font-family: 'Nunito', Arial, sans-serif;
+}
+
+.advice {
+  background: var(--yellow-light);
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 16px;
+  color: var(--brown);
+  font-size: 14px;
+}
+
+.disclaimer {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--red-dark);
+}
+
+.result { padding: 20px 20px 60px; text-align: center; }
+.result h2 { color: var(--brown); }
+
+.card {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.b {
+  background-color: var(--white);
+  width: 210px;
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: left;
+  border-top: 4px solid var(--yellow);
+}
+
+.b h3 { color: var(--brown); }
+.b p { color: var(--brown-soft); line-height: 1.5; font-size: 14px; }

@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Nunito:wght@400;600&display=swap');
+
+:root {
+  --yellow: #FFD54F;
+  --yellow-light: #FFEAA8;
+  --cream: #FFF8EC;
+  --brown: #4A3728;
+  --brown-soft: #6B5544;
+  --red: #D6504A;
+  --red-dark: #B5392F;
+  --white: #FFFFFF;
+  --shadow: 0 6px 18px rgba(74, 55, 40, 0.08);
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Nunito', Arial, sans-serif;
+  background-color: var(--cream);
+  color: var(--brown);
+}
+
+h1, h2, h3, .logo {
+  font-family: 'Baloo 2', 'Nunito', Arial, sans-serif;
+}
+
+button {
+  padding: 11px 22px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Nunito', Arial, sans-serif;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+button:hover { transform: translateY(-1px); opacity: 0.92; }
+
+.btn-primary { background-color: var(--red); color: var(--white); }
+.btn-secondary { background-color: var(--white); color: var(--red); border: 2px solid var(--red); }
+.btn-soft { background-color: var(--yellow-light); color: var(--brown); }

@@ -1,0 +1,100 @@
+.hero {
+  background: linear-gradient(180deg, var(--yellow-light) 0%, var(--cream) 100%);
+  padding: 60px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  text-align: left;
+}
+
+.hero-mascot {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(74, 55, 40, 0.15));
+}
+
+.hero-text { max-width: 480px; }
+
+.hero h1 {
+  color: var(--brown);
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.hero p {
+  color: var(--brown-soft);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.hero-buttons { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+
+.search {
+  background-color: var(--white);
+  padding: 45px 20px;
+  text-align: center;
+}
+
+.search h2 { color: var(--brown); }
+
+.srcbird {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.srcbird input {
+  width: 320px;
+  max-width: 80%;
+  padding: 12px 16px;
+  border: 2px solid var(--yellow-light);
+  border-radius: 10px;
+  font-family: 'Nunito', Arial, sans-serif;
+}
+
+.explore-sec {
+  padding: 55px 20px;
+  text-align: center;
+}
+
+.explore-sec h2 { color: var(--brown); margin-bottom: 30px; }
+
+.card-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background-color: var(--white);
+  width: 230px;
+  padding: 24px;
+  border-radius: var(--radius);
+  text-align: left;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--yellow);
+}
+
+.card h3 { color: var(--brown); margin-top: 0; }
+.card p { color: var(--brown-soft); line-height: 1.5; font-size: 14px; }
+
+.about {
+  background-color: var(--yellow-light);
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.about h2 { color: var(--brown); }
+.about p { max-width: 700px; margin: auto; color: var(--brown-soft); line-height: 1.6; }
+
+@media (max-width: 800px) {
+  .hero { flex-direction: column; text-align: center; }
+  .hero-text { text-align: center; }
+  .hero-buttons { justify-content: center; }
+}

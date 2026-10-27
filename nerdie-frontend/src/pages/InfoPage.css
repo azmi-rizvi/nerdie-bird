@@ -1,0 +1,36 @@
+.ihero {
+  background: var(--yellow-light);
+  padding: 55px 20px;
+  text-align: center;
+}
+
+.ihero h1 { color: var(--brown); font-size: 34px; }
+.ihero p { color: var(--brown-soft); }
+
+.info-grid {
+  padding: 45px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.info-card {
+  background-color: var(--white);
+  width: 240px;
+  padding: 22px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--red);
+  text-align: left;
+}
+
+.info-card h3 { color: var(--brown); margin-top: 0; }
+.info-card p { color: var(--brown-soft); font-size: 14px; line-height: 1.5; }
+
+.info-note {
+  text-align: center;
+  padding: 10px 20px 60px;
+  color: var(--brown-soft);
+  font-size: 14px;
+}
