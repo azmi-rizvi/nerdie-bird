@@ -59,7 +59,12 @@ npm run install:all
 ```
 *(Alternatively, run `npm install` in both `backend` and `nerdie-frontend`)*
 
-### 2. Run Concurrently (Recommended)
+### Configure Gemini AI (backend only)
+Copy `backend/.env.example` to `backend/.env` and set `GEMINI_API_KEY` to a key from Google AI Studio. The key is read only by the backend and must never be added to frontend environment variables. `GEMINI_MODEL` is optional; the default is `gemini-2.5-flash`.
+
+AI endpoints return a clear error instead of invented AI results when Gemini is unconfigured, rate-limited, times out, or returns an unreadable response. Identification accepts JPEG, PNG, and WEBP files up to 10 MB, validates file contents, and sends the image bytes to Gemini without retaining the upload.
+
+### 3. Run Concurrently (Recommended)
 From the root directory:
 ```bash
 npm run dev
@@ -114,7 +119,7 @@ On first startup, `backend/database.js` automatically creates and populates `bac
 - `GET /api/species/:id` — Detailed care, habitat, diet, and behavior profile for a specific species.
 
 ### 2. Bird Identification (`/api/identify`)
-- `POST /api/identify` — Accepts `multipart/form-data` with an image file (`photo`) and/or text `description`. Returns a matched species from the database, confidence score (%), and identification rationale.
+- `POST /api/identify` — Accepts `multipart/form-data` with a JPEG, PNG, or WEBP image (`photo` or `image`, up to 10 MB) and/or text `description`. Gemini analyzes the supplied image bytes and/or description and returns a species, confidence, and rationale. Uploads are not retained.
 
 ### 3. Symptom Checker (`/api/symptoms`)
 - `GET /api/symptoms` — Retrieve all cataloged symptoms.

@@ -1,138 +1,150 @@
 const express = require('express');
-const router = express.Router();
 const db = require('../database');
-const { generateAIContent } = require('../utils/gemini');
+const { generateAIContent, sendGeminiError } = require('../utils/gemini');
 
-// GET /api/symptoms - Retrieve all pre-populated symptoms from database
+const router = express.Router();
+const DISCLAIMER = 'This tool provides general educational guidance only and is NOT a substitute for professional veterinary diagnosis or emergency treatment. Always consult an avian veterinarian for health concerns.';
+
+// GET /api/symptoms - Retrieve symptom catalog from database
 router.get('/', (req, res) => {
   try {
     const symptoms = db.prepare('SELECT * FROM symptoms ORDER BY symptom ASC').all();
-    res.json(symptoms);
-  } catch (err) {
-    console.error('Error fetching symptoms:', err);
-    res.status(500).json({ error: 'Failed to fetch symptoms' });
+    return res.json(symptoms);
+  } catch (error) {
+    console.error('Error fetching symptom catalog:', error);
+    return res.status(500).json({ error: 'Failed to fetch the symptom catalog.' });
   }
 });
 
-// POST /api/symptoms - Check symptoms using Gemini AI + database knowledge
+function isValidAIResponse(data) {
+  return data && typeof data === 'object' &&
+    Array.isArray(data.possible_causes) && data.possible_causes.length > 0 &&
+    Array.isArray(data.care_tips) && data.care_tips.length > 0 &&
+    typeof data.vet_emergency_flag === 'boolean';
+}
+
+// POST /api/symptoms - Full AI symptom evaluation with intelligent fallback
 router.post('/', async (req, res) => {
-  try {
-    let { symptoms, symptom, species, birdName } = req.body;
+  const { symptoms, symptom, species, birdName } = req.body || {};
+  const rawSymptoms = Array.isArray(symptoms)
+    ? symptoms
+    : [typeof symptoms === 'string' ? symptoms : symptom];
 
-    // Normalize symptoms into an array of strings
-    let selectedSymptoms = [];
-    if (Array.isArray(symptoms)) {
-      selectedSymptoms = symptoms.filter(s => typeof s === 'string' && s.trim().length > 0);
-    } else if (typeof symptoms === 'string' && symptoms.trim().length > 0) {
-      selectedSymptoms = [symptoms.trim()];
-    } else if (typeof symptom === 'string' && symptom.trim().length > 0) {
-      selectedSymptoms = [symptom.trim()];
-    }
+  const selectedSymptoms = [...new Set(rawSymptoms
+    .filter(item => typeof item === 'string')
+    .map(item => item.trim())
+    .filter(Boolean))];
 
-    if (selectedSymptoms.length === 0) {
-      return res.status(400).json({
-        error: 'Please select or provide at least one symptom to evaluate.'
-      });
-    }
+  if (!selectedSymptoms.length) {
+    return res.status(400).json({ error: 'Please select or provide at least one symptom to evaluate.' });
+  }
+  if (selectedSymptoms.length > 20 || selectedSymptoms.some(item => item.length > 300)) {
+    return res.status(400).json({ error: 'Please provide up to 20 symptoms, each under 300 characters.' });
+  }
 
-    const birdSpecies = species || (birdName ? `Bird named ${birdName}` : 'Companion Bird');
+  const birdSpecies = typeof species === 'string' && species.trim()
+    ? species.trim().slice(0, 100)
+    : 'Companion bird';
+  const safeBirdName = typeof birdName === 'string' ? birdName.trim().slice(0, 100) : '';
 
-    // 1. Check local database for immediate baseline reference
-    const matchedRecords = [];
-    for (const item of selectedSymptoms) {
-      const match = db.prepare(`
-        SELECT * FROM symptoms 
-        WHERE LOWER(symptom) = LOWER(?) OR LOWER(symptom) LIKE LOWER(?)
-      `).get(item, `%${item}%`);
-      if (match && !matchedRecords.some(r => r.id === match.id)) {
-        matchedRecords.push(match);
-      }
-    }
-    const dbEmergency = matchedRecords.some(r => r.vet_emergency === 1);
+  const prompt = `You are an expert avian health and triage education assistant.
+A bird owner reports the following observed symptoms:
+- Bird Species: ${JSON.stringify(birdSpecies)}
+- Bird Name: ${JSON.stringify(safeBirdName || 'not provided')}
+- Symptoms: ${JSON.stringify(selectedSymptoms)}
 
-    // 2. Call Gemini AI for specialized species-aware clinical assessment
-    let aiData = null;
-
-    try {
-      const promptText = `
-You are an expert avian veterinarian consulting on companion bird health.
-A user has reported symptoms for their bird:
-- Species/Bird: ${birdSpecies}
-- Observed Symptoms: ${selectedSymptoms.join(', ')}
-
-Analyze these symptoms specifically in the context of avian physiology and this bird species.
-Determine if any of these symptoms represent a critical life-threatening emergency (such as acute respiratory distress, severe bleeding, egg binding, extreme hypothermia, or rapid hypoglycemia).
-Provide actionable home first-aid care tips and possible causes.
+Provide an avian-specific clinical analysis:
+1. Explain possible causes (clearly stated as possibilities, not definitive diagnoses).
+2. Detail immediate, safe supportive care steps (temperature regulation, quiet environment, hydration, minimizing handling).
+3. Determine if any symptom represents an acute medical emergency (such as tail-bobbing/open-mouth breathing, active bleeding, severe lethargy on cage floor, seizures, egg binding). Set vet_emergency_flag to true if urgent.
 
 Respond with ONLY a valid JSON object matching this schema:
 {
   "possible_causes": [
-    "Cause 1 with clinical explanation",
-    "Cause 2 with clinical explanation"
+    "Cause 1 explanation tailored to this bird species",
+    "Cause 2 explanation"
   ],
   "care_tips": [
-    "Immediate supportive care step 1",
-    "Immediate supportive care step 2"
+    "Safe supportive step 1",
+    "Safe supportive step 2"
   ],
-  "vet_emergency_flag": true,
-  "disclaimer": "Disclaimer: This tool provides general guidance only and is not a replacement for professional veterinary medical advice."
-}
-`;
+  "vet_emergency_flag": false,
+  "clinical_summary": "1-2 sentence overview of the health situation"
+}`;
 
-      const aiResponse = await generateAIContent({
-        contents: promptText,
-        responseMimeType: 'application/json'
-      });
+  let aiData = null;
+  let modelUsed = null;
 
-      aiData = aiResponse.data;
-    } catch (aiErr) {
-      console.warn('[Symptoms AI Warning] Gemini API unavailable or errored, falling back to local database:', aiErr.message);
-    }
-
-    // If AI succeeded, use its comprehensive assessment; otherwise construct from database
-    let possibleCausesArr = [];
-    let careTipsArr = [];
-    let isEmergency = dbEmergency;
-    let disclaimerText = "Disclaimer: This tool provides general guidance only and is not a replacement for professional veterinary medical advice.";
-
-    if (aiData && Array.isArray(aiData.possible_causes)) {
-      possibleCausesArr = aiData.possible_causes;
-      careTipsArr = Array.isArray(aiData.care_tips) ? aiData.care_tips : [aiData.care_tips].filter(Boolean);
-      isEmergency = Boolean(aiData.vet_emergency_flag || dbEmergency);
-      if (aiData.disclaimer) disclaimerText = aiData.disclaimer;
-    } else {
-      // Database fallback
-      possibleCausesArr = matchedRecords.length > 0
-        ? matchedRecords.map(r => `${r.symptom}: ${r.possible_causes}`)
-        : [`Non-specific symptoms reported (${selectedSymptoms.join(', ')}). May stem from nutritional imbalance, infection, or environmental stress.`];
-
-      careTipsArr = matchedRecords.length > 0
-        ? matchedRecords.map(r => `${r.symptom}: ${r.care_tips}`)
-        : ['Keep the bird in a quiet, warm (82-85°F) draft-free room. Offer fresh water and easily digestible food. Monitor closely.'];
-    }
-
-    // Consolidated human-readable summary
-    const summaryText = isEmergency
-      ? 'CRITICAL WARNING: One or more symptoms indicate a potential avian emergency. Birds conceal illness until it is advanced; please contact an avian veterinarian or animal emergency clinic immediately.'
-      : 'ADVISORY: These symptoms may be manageable with close observation, environmental adjustments, and proper hydration. If condition does not improve within 24 hours, seek veterinary guidance.';
-
-    // Construct response satisfying both prompt schema and backward compatibility
-    res.json({
-      possible_causes: possibleCausesArr,
-      care_tips: careTipsArr,
-      vet_emergency_flag: isEmergency,
-      disclaimer: disclaimerText,
-      // Backward-compatible fields
-      bird_name: birdName || birdSpecies,
-      selected_symptoms: selectedSymptoms,
-      vet_emergency: isEmergency,
-      recommendation_summary: summaryText,
-      details: matchedRecords
+  try {
+    const result = await generateAIContent({
+      contents: prompt,
+      responseMimeType: 'application/json',
+      timeoutMs: 30000
     });
-  } catch (err) {
-    console.error('Error in symptom checker:', err);
-    res.status(500).json({ error: 'Failed to process symptom check: ' + err.message });
+
+    aiData = result.data;
+    modelUsed = result.modelUsed;
+
+    if (!isValidAIResponse(aiData)) {
+      throw new Error('Gemini returned an incomplete symptom assessment.');
+    }
+  } catch (error) {
+    console.warn('[Symptoms AI Fallback]:', error.message);
+
+    // Limit or connection fallback: query local database records for selected symptoms
+    const matchedRecords = selectedSymptoms.flatMap(item => {
+      const match = db.prepare(`
+        SELECT * FROM symptoms
+        WHERE LOWER(symptom) = LOWER(?) OR LOWER(symptom) LIKE LOWER(?)
+        LIMIT 1
+      `).get(item, `%${item}%`);
+      return match ? [match] : [];
+    });
+
+    if (matchedRecords.length > 0) {
+      aiData = {
+        possible_causes: matchedRecords.map(r => `${r.symptom}: ${r.possible_causes}`),
+        care_tips: matchedRecords.map(r => `${r.symptom}: ${r.care_tips}`),
+        vet_emergency_flag: matchedRecords.some(r => r.vet_emergency === 1),
+        clinical_summary: 'Evaluation generated from verified avian health database records.',
+        fallback: true
+      };
+      modelUsed = 'database-fallback';
+    } else {
+      // If neither AI nor database matched, return structured error
+      return sendGeminiError(res, error);
+    }
   }
+
+  // Cross-reference with database records to ensure emergency is flagged if either AI or DB indicates it
+  const matchedRecords = selectedSymptoms.flatMap(item => {
+    const match = db.prepare(`
+      SELECT * FROM symptoms
+      WHERE LOWER(symptom) = LOWER(?) OR LOWER(symptom) LIKE LOWER(?)
+      LIMIT 1
+    `).get(item, `%${item}%`);
+    return match ? [match] : [];
+  });
+
+  const isEmergency = Boolean(aiData.vet_emergency_flag || matchedRecords.some(record => record.vet_emergency === 1));
+
+  const summary = isEmergency
+    ? 'CRITICAL WARNING: One or more symptoms indicate an avian medical emergency. Birds conceal illness until it is advanced; please contact an avian veterinarian or animal emergency hospital immediately.'
+    : (aiData.clinical_summary || 'ADVISORY: Monitor your bird closely. If symptoms persist beyond 24 hours or if condition worsens, seek veterinary guidance promptly.');
+
+  return res.json({
+    possible_causes: aiData.possible_causes,
+    care_tips: aiData.care_tips,
+    vet_emergency_flag: isEmergency,
+    disclaimer: DISCLAIMER,
+    bird_name: safeBirdName || birdSpecies,
+    selected_symptoms: selectedSymptoms,
+    vet_emergency: isEmergency,
+    recommendation_summary: summary,
+    details: matchedRecords,
+    ai_generated: !aiData.fallback,
+    ai_model: modelUsed
+  });
 });
 
 module.exports = router;

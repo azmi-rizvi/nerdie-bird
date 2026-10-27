@@ -100,6 +100,7 @@ function Symptom() {
       <div className="ihero">
         <h1>Gemini AI Symptom Checker</h1>
         <p>Analyze observed avian health symptoms using Google Gen AI clinical evaluation.</p>
+        <p><strong>This is general information, not veterinary advice or a diagnosis. Seek an avian veterinarian for medical concerns; breathing trouble, collapse, or active bleeding needs emergency care.</strong></p>
       </div>
 
       <section className="symptom">
@@ -198,9 +199,7 @@ function Symptom() {
               </h3>
               <p>
                 <strong>Evaluation for {result.bird_name || birdSpecies || "your bird"}:</strong>{" "}
-                {isEmergency
-                  ? "One or more reported symptoms represent an acute avian emergency. Birds conceal clinical signs until decompensation occurs. Contact a 24-hour emergency avian veterinarian immediately."
-                  : "These symptoms suggest a mild or early-stage concern. Follow supportive care steps and monitor closely for appetite or respiration changes."}
+                {result.recommendation_summary}
               </p>
             </div>
 
@@ -224,8 +223,7 @@ function Symptom() {
 
             <div className="prominent-disclaimer">
               <strong>⚠️ VETERINARY MEDICAL DISCLAIMER</strong>
-              {result.disclaimer ||
-                "Disclaimer: This tool provides general guidance only and is not a replacement for professional veterinary medical advice. Always consult a licensed avian veterinarian."}
+              {result.disclaimer || "This tool provides general information only; it is not veterinary advice or a diagnosis. Contact a licensed avian veterinarian for medical concerns."}
             </div>
           </div>
         )}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { identifyBird, getImageUrl } from "../services/api";
 import "./Identify.css";
@@ -11,9 +11,29 @@ function Identify() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  useEffect(() => () => {
+    if (preview) URL.revokeObjectURL(preview);
+  }, [preview]);
+
   function handleFileChange(e) {
     const selected = e.target.files[0];
     if (selected) {
+      if (!["image/jpeg", "image/png", "image/webp"].includes(selected.type)) {
+        setFile(null);
+        setPreview(null);
+        setResult(null);
+        setError("Unsupported image type. Please choose a JPEG, PNG, or WEBP image.");
+        e.target.value = "";
+        return;
+      }
+      if (selected.size > 10 * 1024 * 1024) {
+        setFile(null);
+        setPreview(null);
+        setResult(null);
+        setError("Image is too large. Please choose an image no larger than 10 MB.");
+        e.target.value = "";
+        return;
+      }
       setFile(selected);
       setPreview(URL.createObjectURL(selected));
       setResult(null);
@@ -35,9 +55,7 @@ function Identify() {
     try {
       const formData = new FormData();
       if (file) {
-        // Append both 'photo' and 'image' to satisfy multer / specs
         formData.append("photo", file);
-        formData.append("image", file);
       }
       if (description.trim()) {
         formData.append("description", description.trim());
@@ -85,7 +103,7 @@ function Identify() {
             <input
               id="bird-file-input"
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               onChange={handleFileChange}
             />
             {preview && <img src={preview} alt="Bird Preview" className="preview-img" />}
@@ -176,11 +194,11 @@ function Identify() {
             <div className="result-stats">
               <div className="result-stat-box">
                 <span>Natural Habitat</span>
-                <p>{result.habitat || "Arid and temperate woodlands"}</p>
+                <p>{result.habitat || "Not provided"}</p>
               </div>
               <div className="result-stat-box">
                 <span>Recommended Diet</span>
-                <p>{result.diet || "Balanced formulated pellets & fresh greens"}</p>
+                <p>{result.diet || "Not provided"}</p>
               </div>
             </div>
 

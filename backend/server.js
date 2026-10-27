@@ -1,6 +1,16 @@
+const path = require('path');
+const dns = require('dns');
+
+// Prioritize IPv4 for Google API network calls
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch (e) {}
+
+require('dotenv').config({ path: path.join(__dirname, '.env') });
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const fs = require('fs');
 
 // Ensure database is initialized
@@ -31,8 +41,8 @@ app.use(cors({
 }));
 
 // 2. Body Parsing Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
 // 3. Static File Serving for Uploads
 app.use('/uploads', express.static(uploadsDir));
@@ -45,8 +55,9 @@ app.get('/api', (req, res) => {
     endpoints: {
       species: '/api/species',
       species_by_id: '/api/species/:id',
-      identification: 'POST /api/identify',
-      symptoms: 'GET & POST /api/symptoms',
+      identification: 'POST /api/identify (Gemini Multimodal Vision)',
+      symptoms: 'GET & POST /api/symptoms (Gemini Clinical Analysis)',
+      bonding: 'POST /api/bonding-tip or /api/bonding (Gemini Personalized Advice)',
       user_birds: 'GET, POST, PUT, DELETE /api/my-birds'
     }
   });
@@ -62,6 +73,7 @@ app.use('/api/identify', identificationRouter);
 app.use('/api/symptoms', symptomsRouter);
 app.use('/api/my-birds', userBirdsRouter);
 app.use('/api/bonding-tip', bondingRouter);
+app.use('/api/bonding', bondingRouter);
 
 // 6. 404 Handler for undefined routes
 app.use((req, res) => {
@@ -88,6 +100,7 @@ function startServer(port, maxRetries = 3) {
     console.log(`   - Symptoms:       http://localhost:${port}/api/symptoms`);
     console.log(`   - My Birds:       http://localhost:${port}/api/my-birds`);
     console.log(`   - Identification: http://localhost:${port}/api/identify`);
+    console.log(`   - Bonding Tip:    http://localhost:${port}/api/bonding-tip`);
     console.log(`===============================================`);
   });
 

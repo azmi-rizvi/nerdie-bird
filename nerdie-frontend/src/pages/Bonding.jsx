@@ -12,9 +12,9 @@ const CORE_TIPS = [
 function Bonding() {
   const [userBirds, setUserBirds] = useState([]);
   const [selectedBirdId, setSelectedBirdId] = useState("");
-  const [species, setSpecies] = useState("Cockatiel");
-  const [age, setAge] = useState("2 years");
-  const [notes, setNotes] = useState("Loves head scratches, occasionally nervous around fast hand motions");
+  const [species, setSpecies] = useState("");
+  const [age, setAge] = useState("");
+  const [notes, setNotes] = useState("");
   const [birdName, setBirdName] = useState("");
   const [loading, setLoading] = useState(false);
   const [tipResult, setTipResult] = useState(null);
@@ -47,6 +47,9 @@ function Bonding() {
     setSelectedBirdId(id);
     if (!id) {
       setBirdName("");
+      setSpecies("");
+      setAge("");
+      setNotes("");
       return;
     }
     const found = userBirds.find((b) => String(b.id) === String(id));
@@ -62,6 +65,7 @@ function Bonding() {
     if (e) e.preventDefault();
     setLoading(true);
     setError(null);
+    setTipResult(null);
 
     try {
       const result = await getBondingTip({
