@@ -1,0 +1,16 @@
+{
+  "name": "feathercare-workspace",
+  "version": "1.0.0",
+  "description": "FeatherCare - Full-stack bird care, species exploration, AI identification & health monitoring app",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run dev --prefix backend\" \"npm run dev --prefix nerdie-frontend\"",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix nerdie-frontend",
+    "build": "npm run build --prefix nerdie-frontend",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix nerdie-frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}

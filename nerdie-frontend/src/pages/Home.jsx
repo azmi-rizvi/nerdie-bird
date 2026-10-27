@@ -1,19 +1,33 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import mascot from "../assets/mascot-trans.png";
 import "./Home.css";
 
 const FEATURES = [
-  { title: "Explore Birds", desc: "Discover different bird species.", to: "/explore", cta: "Explore" },
+  { title: "Explore Birds", desc: "Discover different bird species with care requirements.", to: "/explore", cta: "Explore" },
   { title: "Bird Identification", desc: "Identify a bird using a photo or description.", to: "/identify", cta: "Identify" },
   { title: "Bonding Guide", desc: "Learn your bird's instincts and how to bond better.", to: "/bonding", cta: "Learn More" },
-  { title: "Symptom Checker", desc: "Spot possible health concerns early.", to: "/symptoms", cta: "Check Symptoms" },
+  { title: "Symptom Checker", desc: "Spot possible health concerns early & check emergency alerts.", to: "/symptoms", cta: "Check Symptoms" },
+  { title: "My Birds Log", desc: "Manage personal bird profiles, health logs, and notes.", to: "/my-birds", cta: "My Birds" },
 ];
 
 function Home() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+
+  function handleSearch(e) {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/explore?search=${encodeURIComponent(searchTerm.trim())}`);
+    } else {
+      navigate("/explore");
+    }
+  }
+
   return (
     <>
       <section className="hero">
-        <img src={mascot} alt="Nerdie Birdie mascot" className="hero-mascot" />
+        <img src={mascot} alt="FeatherCare mascot" className="hero-mascot" />
         <div className="hero-text">
           <h1>Understand Your Bird Better</h1>
           <p>
@@ -29,14 +43,19 @@ function Home() {
 
       <section className="search">
         <h2>Find Your Bird</h2>
-        <div className="srcbird">
-          <input type="text" placeholder="Search up a bird" />
-          <button className="btn-primary">Search</button>
-        </div>
+        <form onSubmit={handleSearch} className="srcbird">
+          <input
+            type="text"
+            placeholder="Search species (e.g. Cockatiel, Budgie, Finch...)"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button type="submit" className="btn-primary">Search</button>
+        </form>
       </section>
 
       <section className="explore-sec">
-        <h2>Explore Nerdie Birdie</h2>
+        <h2>Explore FeatherCare</h2>
         <div className="card-grid">
           {FEATURES.map((f) => (
             <div className="card" key={f.title}>
@@ -49,12 +68,12 @@ function Home() {
       </section>
 
       <section className="about">
-        <h2>About Nerdie Birdie</h2>
+        <h2>About FeatherCare</h2>
         <p>
-          Nerdie Birdie helps you understand your bird better by providing
-          simple information about birds, their species, behaviour, and care —
-          with AI-powered identification, personalized bonding tips, and an
-          early symptom checker, all in one place.
+          FeatherCare helps you understand your bird better by providing
+          authoritative information about avian species, behaviour, and health care —
+          with AI-assisted species identification, personalized bonding tips, an
+          early symptom checker, and personal flock logs, all in one place.
         </p>
       </section>
     </>

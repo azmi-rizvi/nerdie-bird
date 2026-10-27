@@ -4,43 +4,197 @@
   text-align: center;
 }
 
-.ihero h1 { color: var(--brown); font-size: 34px; }
-.ihero p { color: var(--brown-soft); }
+.ihero h1 { color: var(--brown); font-size: 34px; margin: 0 0 10px; }
+.ihero p { color: var(--brown-soft); margin: 0; font-size: 16px; }
 
 .identify {
   background-color: var(--white);
-  max-width: 600px;
-  margin: 50px auto;
-  padding: 40px;
+  max-width: 650px;
+  margin: 40px auto;
+  padding: 36px;
   text-align: center;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  border-top: 4px solid var(--red);
 }
 
-.identify h2 { color: var(--brown); }
-.identify input { margin: 20px 0; }
+.identify h2 { color: var(--brown); margin-top: 0; }
+
+.identify-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+.upload-dropzone {
+  border: 2px dashed #e0d2be;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  background: var(--cream);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.upload-dropzone:hover {
+  border-color: var(--yellow);
+}
+
+.upload-dropzone input[type="file"] {
+  display: none;
+}
+
+.dropzone-label {
+  cursor: pointer;
+  display: block;
+}
+
+.dropzone-icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 8px;
+}
 
 .preview-img {
   display: block;
-  max-width: 220px;
-  max-height: 220px;
-  margin: 10px auto 20px;
+  max-width: 260px;
+  max-height: 240px;
+  margin: 14px auto 0;
   border-radius: var(--radius);
   object-fit: cover;
   border: 3px solid var(--yellow);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.result { padding: 10px 20px 60px; text-align: center; }
+.desc-input-group label {
+  display: block;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--brown);
+  margin-bottom: 6px;
+}
+
+.desc-input-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--yellow-light);
+  border-radius: 10px;
+  font-family: 'Nunito', Arial, sans-serif;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 70px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.desc-input-group textarea:focus {
+  border-color: var(--yellow);
+}
+
+.result {
+  padding: 10px 20px 60px;
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
 .result h2 { color: var(--brown); }
 .result p { color: var(--brown-soft); }
 
 .result-card {
-  max-width: 400px;
-  margin: 10px auto;
-  background: var(--yellow-light);
-  padding: 20px;
+  background: var(--white);
+  padding: 24px;
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--yellow);
+  text-align: left;
+  margin-top: 16px;
 }
 
-.result-card h3 { color: var(--brown); margin: 0 0 8px; }
-.result-card p { color: var(--brown-soft); margin: 0; font-size: 14px; }
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.result-header h3 {
+  color: var(--brown);
+  margin: 0;
+  font-size: 24px;
+}
+
+.confidence-badge {
+  background: #2e7d32;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.result-img {
+  width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.result-rationale {
+  background: var(--yellow-light);
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.result-rationale strong {
+  display: block;
+  color: var(--brown);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.result-rationale p {
+  color: var(--brown);
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.result-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.result-stat-box {
+  background: var(--cream);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.result-stat-box span {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brown-soft);
+}
+
+.result-stat-box strong {
+  font-size: 13px;
+  color: var(--brown);
+}
+
+.error-banner {
+  background: #ffebee;
+  color: #c62828;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 10px;
+}

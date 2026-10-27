@@ -14,12 +14,19 @@
 }
 
 .esearch input {
-  width: 320px;
-  max-width: 80%;
+  width: 340px;
+  max-width: 85%;
   padding: 12px 16px;
   border: 2px solid var(--yellow-light);
   border-radius: 10px;
   font-family: 'Nunito', Arial, sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.esearch input:focus {
+  border-color: var(--yellow);
 }
 
 .filters {
@@ -27,39 +34,192 @@
   justify-content: center;
   gap: 10px;
   margin-top: 16px;
+  flex-wrap: wrap;
 }
 
 .birds {
   padding: 45px 20px;
   display: flex;
   justify-content: center;
-  gap: 22px;
+  gap: 24px;
   flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .bird {
   background-color: var(--white);
-  width: 230px;
-  padding: 22px;
+  width: 280px;
+  padding: 0;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   position: relative;
   border-top: 4px solid var(--red);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bird:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(74, 55, 40, 0.12);
+}
+
+.bird-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  background-color: var(--yellow-light);
+}
+
+.bird-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .bird-tag {
   position: absolute;
-  top: -10px;
+  top: 12px;
   right: 14px;
   background: var(--red);
   color: var(--white);
   font-size: 11px;
   font-weight: 700;
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 2;
 }
 
-.bird h2 { color: var(--brown); margin-top: 6px; }
+.bird h2 { color: var(--brown); margin: 6px 0 10px; font-size: 22px; }
 .bird p { color: var(--brown-soft); line-height: 1.5; font-size: 14px; }
-.fun-fact { font-style: italic; font-size: 13px; }
-.no-results { color: var(--brown-soft); padding: 30px; }
+.fun-fact { font-style: italic; font-size: 13px; margin: 10px 0 16px; color: var(--brown); }
+.bird-btn-row { margin-top: auto; display: flex; gap: 8px; }
+
+.no-results, .loading-state, .error-state {
+  color: var(--brown-soft);
+  padding: 40px;
+  text-align: center;
+  font-size: 16px;
+  width: 100%;
+}
+
+/* Modal styling */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background: var(--white);
+  border-radius: var(--radius);
+  max-width: 650px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+  position: relative;
+  border-top: 6px solid var(--red);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--brown);
+  z-index: 10;
+  padding: 0;
+}
+
+.modal-header-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  background-color: var(--yellow-light);
+}
+
+.modal-body {
+  padding: 24px 28px 32px;
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.modal-title-row h2 {
+  margin: 0;
+  font-size: 28px;
+  color: var(--brown);
+}
+
+.modal-tag {
+  background: var(--yellow-light);
+  color: var(--brown);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.modal-field {
+  background: var(--cream);
+  padding: 12px 14px;
+  border-radius: 10px;
+}
+
+.modal-field.full {
+  grid-column: 1 / -1;
+}
+
+.modal-field label {
+  display: block;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--brown-soft);
+  margin-bottom: 4px;
+}
+
+.modal-field p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--brown);
+}
