@@ -20,6 +20,7 @@ body {
   font-family: 'Nunito', Arial, sans-serif;
   background-color: var(--cream);
   color: var(--brown);
+  scroll-behavior: smooth;
 }
 
 h1, h2, h3, .logo {
@@ -42,3 +43,52 @@ button:hover { transform: translateY(-1px); opacity: 0.92; }
 .btn-primary { background-color: var(--red); color: var(--white); }
 .btn-secondary { background-color: var(--white); color: var(--red); border: 2px solid var(--red); }
 .btn-soft { background-color: var(--yellow-light); color: var(--brown); }
+
+/* Global AI Feedback & Loader Components */
+.ai-loading-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--white);
+  padding: 24px 28px;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(74, 55, 40, 0.1);
+  border: 2px dashed var(--yellow);
+  margin: 30px auto 10px;
+  max-width: 680px;
+  animation: aiFadeIn 0.3s ease-out;
+  text-align: left;
+}
+
+.ai-spinner {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border: 4px solid var(--yellow-light);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: aiSpin 0.85s linear infinite;
+}
+
+.ai-loading-text h3 {
+  margin: 0 0 6px;
+  color: var(--brown);
+  font-size: 17px;
+  font-family: 'Baloo 2', Arial, sans-serif;
+}
+
+.ai-loading-text p {
+  margin: 0;
+  color: var(--brown-soft);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+@keyframes aiSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes aiFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

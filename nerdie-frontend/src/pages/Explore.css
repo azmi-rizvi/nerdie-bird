@@ -14,19 +14,20 @@
 }
 
 .esearch input {
-  width: 340px;
-  max-width: 85%;
-  padding: 12px 16px;
+  width: 360px;
+  max-width: 90%;
+  padding: 12px 18px;
   border: 2px solid var(--yellow-light);
-  border-radius: 10px;
+  border-radius: 12px;
   font-family: 'Nunito', Arial, sans-serif;
   font-size: 15px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .esearch input:focus {
   border-color: var(--yellow);
+  box-shadow: 0 0 0 3px rgba(255, 213, 79, 0.25);
 }
 
 .filters {
@@ -37,67 +38,146 @@
   flex-wrap: wrap;
 }
 
+/* Explore Birds Card Layout - Image on Left, Body on Right */
 .birds {
-  padding: 45px 20px;
+  padding: 40px 20px 60px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   gap: 24px;
-  flex-wrap: wrap;
-  max-width: 1200px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
 .bird {
   background-color: var(--white);
-  width: 280px;
-  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  position: relative;
-  border-top: 4px solid var(--red);
-  display: flex;
-  flex-direction: column;
+  border-left: 5px solid var(--red);
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 220px;
 }
 
 .bird:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(74, 55, 40, 0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(74, 55, 40, 0.12);
+}
+
+.bird-left {
+  position: relative;
+  width: 280px;
+  min-width: 260px;
+  max-width: 300px;
+  background-color: var(--yellow-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .bird-img {
   width: 100%;
-  height: 180px;
+  height: 100%;
   object-fit: cover;
-  background-color: var(--yellow-light);
+  object-position: center;
+  display: block;
+  transition: transform 0.35s ease;
 }
 
-.bird-content {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+.bird:hover .bird-img {
+  transform: scale(1.04);
 }
 
 .bird-tag {
   position: absolute;
-  top: 12px;
-  right: 14px;
+  top: 14px;
+  left: 14px;
   background: var(--red);
   color: var(--white);
   font-size: 11px;
   font-weight: 700;
   padding: 4px 12px;
   border-radius: 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.22);
   z-index: 2;
+  letter-spacing: 0.3px;
 }
 
-.bird h2 { color: var(--brown); margin: 6px 0 10px; font-size: 22px; }
-.bird p { color: var(--brown-soft); line-height: 1.5; font-size: 14px; }
-.fun-fact { font-style: italic; font-size: 13px; margin: 10px 0 16px; color: var(--brown); }
-.bird-btn-row { margin-top: auto; display: flex; gap: 8px; }
+.bird-content {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.bird-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.bird-header-row h2 {
+  color: var(--brown);
+  margin: 0;
+  font-size: 24px;
+  font-family: 'Baloo 2', Arial, sans-serif;
+}
+
+.bird-quick-stats {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 10px;
+  flex-wrap: wrap;
+}
+
+.stat-pill {
+  font-size: 13px;
+  background: var(--cream);
+  padding: 4px 12px;
+  border-radius: 8px;
+  color: var(--brown);
+  border: 1px solid rgba(74, 55, 40, 0.08);
+}
+
+.fun-fact {
+  font-style: italic;
+  font-size: 13.5px;
+  margin: 8px 0 18px;
+  color: var(--brown-soft);
+  line-height: 1.5;
+}
+
+.bird-btn-row {
+  margin-top: auto;
+  display: flex;
+  gap: 12px;
+  max-width: 360px;
+}
+
+@media (max-width: 720px) {
+  .bird {
+    flex-direction: column;
+    border-left: none;
+    border-top: 5px solid var(--red);
+  }
+  .bird-left {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: 220px;
+  }
+  .bird-content {
+    padding: 20px;
+  }
+  .bird-btn-row {
+    max-width: 100%;
+  }
+}
 
 .no-results, .loading-state, .error-state {
   color: var(--brown-soft);
@@ -111,38 +191,38 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
 }
 
 .modal-content {
   background: var(--white);
   border-radius: var(--radius);
-  max-width: 650px;
+  max-width: 660px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.25);
   position: relative;
   border-top: 6px solid var(--red);
-  animation: fadeIn 0.2s ease-out;
+  animation: modalFadeIn 0.25s ease-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .modal-close {
   position: absolute;
   top: 14px;
   right: 14px;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.9);
   border: 1px solid #e0e0e0;
   border-radius: 50%;
   width: 36px;
@@ -156,11 +236,17 @@
   color: var(--brown);
   z-index: 10;
   padding: 0;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.modal-close:hover {
+  background: var(--white);
+  transform: rotate(90deg);
 }
 
 .modal-header-img {
   width: 100%;
-  height: 240px;
+  height: 260px;
   object-fit: cover;
   background-color: var(--yellow-light);
 }

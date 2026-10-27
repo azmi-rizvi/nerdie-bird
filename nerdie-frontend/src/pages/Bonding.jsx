@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getMyBirds, getBondingTip } from "../services/api";
 import "./InfoPage.css";
 import "./Bonding.css";
@@ -20,6 +20,8 @@ function Bonding() {
   const [tipResult, setTipResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const resultRef = useRef(null);
+
   // Load user birds if any exist
   useEffect(() => {
     async function loadBirds() {
@@ -27,7 +29,6 @@ function Bonding() {
         const birds = await getMyBirds();
         if (Array.isArray(birds) && birds.length > 0) {
           setUserBirds(birds);
-          // Autofill first bird
           const first = birds[0];
           setSelectedBirdId(first.id);
           setBirdName(first.name);
@@ -41,6 +42,19 @@ function Bonding() {
     }
     loadBirds();
   }, []);
+
+  // Smooth auto-scroll to loader or results
+  useEffect(() => {
+    if (loading && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (tipResult && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [tipResult]);
 
   function handleBirdSelect(e) {
     const id = e.target.value;
@@ -160,8 +174,20 @@ function Bonding() {
             </button>
           </form>
 
+          {/* Dedicated AI Loading Card */}
+          {loading && (
+            <div className="ai-loading-card" ref={resultRef}>
+              <div className="ai-spinner"></div>
+              <div className="ai-loading-text">
+                <h3>Generating Custom Bonding Routine with Gemini AI...</h3>
+                <p>Personalizing safe, choice-based interaction steps and body-language cues for your bird. Please wait a moment.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Generated Result Card */}
           {tipResult && (
-            <div className="bonding-card">
+            <div className="bonding-card" ref={resultRef}>
               <div className="bonding-card-header">
                 <h3>{tipResult.bonding_tip_title}</h3>
                 <span className="recommended-pill">

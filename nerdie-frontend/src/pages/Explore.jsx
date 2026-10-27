@@ -118,22 +118,35 @@ function Explore() {
         <div className="birds">
           {speciesList.map((b) => (
             <div className="bird" key={b.id || b.name}>
-              <span className="bird-tag">{b.type}</span>
-              {b.image_url && (
-                <img
-                  src={getImageUrl(b.image_url)}
-                  alt={b.name}
-                  className="bird-img"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.style.display = 'none';
-                  }}
-                />
-              )}
+              <div className="bird-left">
+                <span className="bird-tag">{b.type}</span>
+                {b.image_url && (
+                  <img
+                    src={getImageUrl(b.image_url)}
+                    alt={b.name}
+                    className="bird-img"
+                    onError={(e) => {
+                      const filename = b.image_url ? b.image_url.split('/').pop() : '';
+                      if (filename && !e.target.src.endsWith('/species/' + filename)) {
+                        e.target.src = `/species/${filename}`;
+                      } else {
+                        e.target.style.display = 'none';
+                      }
+                    }}
+                  />
+                )}
+              </div>
               <div className="bird-content">
-                <h2>{b.name}</h2>
-                <p><strong>Lifespan:</strong> {b.lifespan || "Varies"}</p>
-                <p className="fun-fact">🪶 {b.fun_facts ? b.fun_facts.substring(0, 95) + "..." : "Gentle companion."}</p>
+                <div className="bird-header-row">
+                  <h2>{b.name}</h2>
+                </div>
+                <div className="bird-quick-stats">
+                  <span className="stat-pill">⏳ <strong>Lifespan:</strong> {b.lifespan || "Varies"}</span>
+                  {b.habitat && (
+                    <span className="stat-pill">🌿 <strong>Habitat:</strong> {b.habitat.length > 45 ? b.habitat.substring(0, 45) + "..." : b.habitat}</span>
+                  )}
+                </div>
+                <p className="fun-fact">🪶 {b.fun_facts ? (b.fun_facts.length > 130 ? b.fun_facts.substring(0, 130) + "..." : b.fun_facts) : "Gentle companion bird."}</p>
                 <div className="bird-btn-row">
                   <button
                     className="btn-soft"
@@ -168,6 +181,12 @@ function Explore() {
                 src={getImageUrl(selectedSpecies.image_url)}
                 alt={selectedSpecies.name}
                 className="modal-header-img"
+                onError={(e) => {
+                  const filename = selectedSpecies.image_url ? selectedSpecies.image_url.split('/').pop() : '';
+                  if (filename && !e.target.src.endsWith('/species/' + filename)) {
+                    e.target.src = `/species/${filename}`;
+                  }
+                }}
               />
             )}
             <div className="modal-body">
@@ -178,44 +197,45 @@ function Explore() {
 
               <div className="modal-grid">
                 <div className="modal-field">
-                  <label>Lifespan</label>
-                  <p>{selectedSpecies.lifespan || "N/A"}</p>
+                  <label>Natural Habitat</label>
+                  <p>{selectedSpecies.habitat || "Information not specified"}</p>
                 </div>
                 <div className="modal-field">
-                  <label>Social Needs</label>
-                  <p>{selectedSpecies.social_needs || "N/A"}</p>
+                  <label>Typical Lifespan</label>
+                  <p>{selectedSpecies.lifespan || "Information not specified"}</p>
                 </div>
                 <div className="modal-field full">
-                  <label>Habitat & Origin</label>
-                  <p>{selectedSpecies.habitat || "N/A"}</p>
+                  <label>Recommended Nutritional Diet</label>
+                  <p>{selectedSpecies.diet || "Information not specified"}</p>
                 </div>
                 <div className="modal-field full">
-                  <label>Recommended Diet</label>
-                  <p>{selectedSpecies.diet || "N/A"}</p>
+                  <label>Cage & Environmental Setup</label>
+                  <p>{selectedSpecies.cage_setup || "Information not specified"}</p>
                 </div>
                 <div className="modal-field full">
-                  <label>Cage & Housing Setup</label>
-                  <p>{selectedSpecies.cage_setup || "N/A"}</p>
+                  <label>Social & Behavioral Needs</label>
+                  <p>{selectedSpecies.social_needs || "Information not specified"}</p>
                 </div>
                 <div className="modal-field full">
-                  <label>Fun Fact</label>
-                  <p>🪶 {selectedSpecies.fun_facts || "N/A"}</p>
+                  <label>Fascinating Fun Facts</label>
+                  <p>{selectedSpecies.fun_facts || "Information not specified"}</p>
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+              <div style={{ display: "flex", gap: "10px", marginTop: "24px" }}>
                 <Link to={`/species/${selectedSpecies.id}`} style={{ flex: 1 }}>
                   <button className="btn-primary" style={{ width: "100%" }}>
-                    Open Dedicated Page
+                    View Dedicated Profile Page
                   </button>
                 </Link>
-                <button
-                  className="btn-secondary"
-                  onClick={() => setSelectedSpecies(null)}
+                <Link
+                  to={`/my-birds?species_id=${selectedSpecies.id}&species_name=${encodeURIComponent(selectedSpecies.name)}`}
                   style={{ flex: 1 }}
                 >
-                  Close
-                </button>
+                  <button className="btn-soft" style={{ width: "100%" }}>
+                    Add to My Birds
+                  </button>
+                </Link>
               </div>
             </div>
           </div>

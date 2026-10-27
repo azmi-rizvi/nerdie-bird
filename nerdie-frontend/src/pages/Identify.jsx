@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { identifyBird, getImageUrl } from "../services/api";
 import "./Identify.css";
@@ -11,9 +11,24 @@ function Identify() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const resultRef = useRef(null);
+
   useEffect(() => () => {
     if (preview) URL.revokeObjectURL(preview);
   }, [preview]);
+
+  // Smooth auto-scroll to loader or results
+  useEffect(() => {
+    if (loading && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (result && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [result]);
 
   function handleFileChange(e) {
     const selected = e.target.files[0];
@@ -147,10 +162,14 @@ function Identify() {
       <section className="result">
         <h2>AI Analysis Results</h2>
 
+        {/* AI Loading Feedback Card */}
         {loading && (
-          <div className="loading-container">
-            <div className="spinner"></div>
-            <p style={{ margin: 0, fontWeight: 600 }}>Analyzing plumage and visual markers with Gemini AI...</p>
+          <div className="ai-loading-card" ref={resultRef}>
+            <div className="ai-spinner"></div>
+            <div className="ai-loading-text">
+              <h3>Analyzing with Gemini Multimodal AI...</h3>
+              <p>Examining plumage patterns, beak geometry, and physical markers to identify the species. Please wait a moment.</p>
+            </div>
           </div>
         )}
 
@@ -159,7 +178,7 @@ function Identify() {
         )}
 
         {result && (
-          <div className="result-card">
+          <div className="result-card" ref={resultRef}>
             <div className="result-header">
               <h3>{speciesDisplayName}</h3>
               <span className="confidence-badge">

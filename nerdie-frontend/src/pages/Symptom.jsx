@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getSymptoms, checkSymptoms } from "../services/api";
 import "./Symptom.css";
 
@@ -23,6 +23,8 @@ function Symptom() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const resultRef = useRef(null);
+
   useEffect(() => {
     async function loadSymptoms() {
       try {
@@ -36,6 +38,19 @@ function Symptom() {
     }
     loadSymptoms();
   }, []);
+
+  // Smooth auto-scroll to loader or results
+  useEffect(() => {
+    if (checking && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [checking]);
+
+  useEffect(() => {
+    if (result && resultRef.current) {
+      resultRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [result]);
 
   function handleToggleSymptom(symptomName) {
     setSelectedSymptoms((prev) =>
@@ -189,8 +204,20 @@ function Symptom() {
           </div>
         </form>
 
+        {/* AI Loading Feedback Card */}
+        {checking && (
+          <div className="ai-loading-card" ref={resultRef}>
+            <div className="ai-spinner"></div>
+            <div className="ai-loading-text">
+              <h3>Consulting Gemini AI Avian Health Assistant...</h3>
+              <p>Analyzing reported symptoms in the context of avian anatomy, evaluating urgency levels, and generating safe supportive advice. Please wait a moment.</p>
+            </div>
+          </div>
+        )}
+
+        {/* AI Evaluation Result Section */}
         {result && (
-          <div className="result-section">
+          <div className="result-section" ref={resultRef}>
             <div className={`alert-banner ${isEmergency ? "emergency" : "advisory"}`}>
               <h3>
                 {isEmergency
@@ -229,18 +256,19 @@ function Symptom() {
         )}
       </section>
 
+      {/* Common Avian Warning Signs - Responsive Left-to-Right Grid */}
       <section className="result">
         <h2>Common Avian Warning Signs</h2>
-        <div className="card">
-          <div className="b">
+        <div className="warning-signs-grid">
+          <div className="warning-card">
             <h3>Not Eating</h3>
             <p>Rapid avian metabolism means going 24 hours without eating can cause hepatic lipidosis and hypoglycemia.</p>
           </div>
-          <div className="b">
+          <div className="warning-card">
             <h3>Tail Bobbing</h3>
             <p>Rhythmic bobbing of the tail feathers with breath cycles indicates acute respiratory compromise.</p>
           </div>
-          <div className="b">
+          <div className="warning-card">
             <h3>Fluffed on Cage Floor</h3>
             <p>Sitting puffed at the bottom of the cage signifies hypothermia and severe illness.</p>
           </div>
