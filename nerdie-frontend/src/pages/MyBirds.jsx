@@ -6,7 +6,8 @@ import {
   updateMyBird,
   deleteMyBird,
   getSpecies,
-  getImageUrl
+  getImageUrl,
+  getBondingTip
 } from "../services/api";
 import mascot from "../assets/mascot-trans.png";
 import "./MyBirds.css";
@@ -24,6 +25,8 @@ function MyBirds() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBird, setEditingBird] = useState(null); // null = creating new
+  const [bondingTipData, setBondingTipData] = useState(null);
+  const [generatingTipId, setGeneratingTipId] = useState(null);
 
   // Form State
   const [formName, setFormName] = useState("");
@@ -66,6 +69,23 @@ function MyBirds() {
   function showToastMessage(msg) {
     setToast(msg);
     setTimeout(() => setToast(null), 3500);
+  }
+
+  async function handleGenerateBondingTip(bird) {
+    setGeneratingTipId(bird.id);
+    try {
+      const tip = await getBondingTip({
+        species: bird.species_name || "Companion Bird",
+        age: bird.age,
+        notes: bird.notes,
+        birdName: bird.name
+      });
+      setBondingTipData(tip);
+    } catch (err) {
+      alert(`Could not generate AI bonding tip: ${err.message}`);
+    } finally {
+      setGeneratingTipId(null);
+    }
   }
 
   function handleOpenCreate() {
@@ -218,6 +238,15 @@ function MyBirds() {
                       Logged on: {bird.created_at ? new Date(bird.created_at).toLocaleDateString() : "Recently"}
                     </div>
 
+                    <button
+                      className="btn-primary"
+                      style={{ width: "100%", marginBottom: "10px", fontSize: "13px" }}
+                      onClick={() => handleGenerateBondingTip(bird)}
+                      disabled={generatingTipId === bird.id}
+                    >
+                      {generatingTipId === bird.id ? "Analyzing with Gemini AI..." : "✨ Today's AI Bonding Tip"}
+                    </button>
+
                     <div className="user-bird-actions">
                       <button
                         className="btn-soft"
@@ -323,6 +352,49 @@ function MyBirds() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Gemini AI Bonding Tip Modal */}
+      {bondingTipData && (
+        <div className="crud-modal-overlay" onClick={() => setBondingTipData(null)}>
+          <div className="crud-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="crud-modal-header">
+              <h2>✨ Today's AI Bonding Activity</h2>
+              <button
+                onClick={() => setBondingTipData(null)}
+                style={{ background: "none", border: "none", fontSize: "22px", cursor: "pointer", color: "var(--brown)" }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ textAlign: "left", marginBottom: "20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <h3 style={{ margin: 0, color: "var(--brown)", fontSize: "20px" }}>{bondingTipData.bonding_tip_title}</h3>
+                <span className="species-badge" style={{ background: "var(--yellow-light)", color: "var(--brown)" }}>
+                  🕒 {bondingTipData.recommended_time}
+                </span>
+              </div>
+
+              <p style={{ color: "var(--brown-soft)", fontSize: "14px", lineHeight: 1.6, background: "var(--cream)", padding: "16px", borderRadius: "10px", margin: 0 }}>
+                {bondingTipData.tip_content}
+              </p>
+
+              <div style={{ marginTop: "12px", fontSize: "12px", color: "var(--brown-soft)" }}>
+                Personalized for <strong>{bondingTipData.bird_name}</strong> ({bondingTipData.species}) based on their behavioral history.
+              </div>
+            </div>
+
+            <div className="crud-btn-row">
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => setBondingTipData(null)}
+              >
+                Got It!
+              </button>
+            </div>
           </div>
         </div>
       )}

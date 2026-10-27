@@ -8,6 +8,7 @@
 
 - **Frontend:** React 19, React Router 7, Vite
 - **Backend:** Node.js, Express.js (v5)
+- **AI Integration:** Official Google Gen AI SDK (`@google/genai`) powered by `GEMINI_API_KEY`
 - **Database:** SQLite (zero-config, high-performance via `better-sqlite3`)
 - **File Uploads:** `multer` (supports multipart photo identification and static image serving via `/uploads`)
 - **CORS:** Configured with `cors` middleware for cross-origin requests from Vite (`http://localhost:5173`, `http://localhost:5174`) and Create React App (`http://localhost:3000`)
@@ -117,9 +118,12 @@ On first startup, `backend/database.js` automatically creates and populates `bac
 
 ### 3. Symptom Checker (`/api/symptoms`)
 - `GET /api/symptoms` — Retrieve all cataloged symptoms.
-- `POST /api/symptoms` — Evaluates an array of selected symptoms (`{ symptoms: [...], birdName: "Sunny" }`). Returns consolidated possible causes, supportive care advice, and a `vet_emergency: true|false` flag.
+- `POST /api/symptoms` — Evaluates an array of selected symptoms (`{ symptoms: [...], species: "Budgie", birdName: "Sunny" }`) with Gemini AI. Returns consolidated `possible_causes`, `care_tips`, a `vet_emergency_flag: true|false`, and a veterinary medical disclaimer.
 
-### 4. My Birds CRUD (`/api/my-birds`)
+### 4. AI Bonding Activity Suggestions (`/api/bonding-tip`)
+- `POST /api/bonding-tip` — Accepts `{ species, age, notes, birdName }`. Prompts Gemini to generate a personalized, positive-reinforcement bonding routine tailored to the bird's behavioral history, returning `bonding_tip_title`, `tip_content`, and `recommended_time`.
+
+### 5. My Birds CRUD (`/api/my-birds`)
 - `GET /api/my-birds` — Retrieve all logged birds joined with species metadata.
 - `POST /api/my-birds` — Create a new bird profile (`{ name, species_id, age, notes }`).
 - `PUT /api/my-birds/:id` — Update bird name, age, or health notes.

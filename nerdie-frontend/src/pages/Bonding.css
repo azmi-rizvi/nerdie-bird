@@ -1,0 +1,130 @@
+.bonding-container {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 20px 20px 80px;
+}
+
+.bonding-widget {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 36px;
+  box-shadow: var(--shadow);
+  border-top: 5px solid var(--yellow);
+  margin-bottom: 50px;
+}
+
+.bonding-widget-header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.bonding-widget-header h2 {
+  color: var(--brown);
+  margin: 0 0 8px;
+  font-size: 26px;
+}
+
+.bonding-widget-header p {
+  color: var(--brown-soft);
+  margin: 0;
+  font-size: 15px;
+}
+
+.bonding-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bonding-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .bonding-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bonding-field {
+  text-align: left;
+}
+
+.bonding-field label {
+  display: block;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--brown);
+  margin-bottom: 6px;
+}
+
+.bonding-field input, .bonding-field select, .bonding-field textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--yellow-light);
+  border-radius: 10px;
+  font-family: 'Nunito', Arial, sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.bonding-field input:focus, .bonding-field select:focus, .bonding-field textarea:focus {
+  border-color: var(--yellow);
+}
+
+.bonding-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.bonding-card {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 26px;
+  margin-top: 28px;
+  border-left: 5px solid var(--red);
+  animation: fadeIn 0.3s ease-out;
+  text-align: left;
+}
+
+.bonding-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bonding-card-header h3 {
+  color: var(--brown);
+  margin: 0;
+  font-size: 22px;
+}
+
+.recommended-pill {
+  background: var(--yellow-light);
+  color: var(--brown);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.bonding-card-content {
+  color: var(--brown);
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 0 0 16px;
+}
+
+.bonding-card-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--brown-soft);
+  font-weight: 600;
+}

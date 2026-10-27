@@ -9,7 +9,7 @@
 
 .symptom {
   background-color: var(--white);
-  max-width: 680px;
+  max-width: 720px;
   margin: 40px auto;
   padding: 36px;
   text-align: left;
@@ -24,8 +24,21 @@
   text-align: center;
 }
 
-.symptom-input-group {
+.symptom-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
   margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+  .symptom-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.symptom-input-group {
+  margin-bottom: 16px;
 }
 
 .symptom-input-group label {
@@ -63,7 +76,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .checkbox-item {
@@ -107,74 +120,86 @@
   margin-left: auto;
 }
 
-/* Advice & Emergency Results */
+/* Results section */
 .result-section {
-  margin-top: 30px;
+  margin-top: 32px;
   animation: fadeIn 0.25s ease-out;
 }
 
 .alert-banner {
-  padding: 18px 20px;
+  padding: 20px 24px;
   border-radius: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .alert-banner.emergency {
   background: #ffebee;
-  border: 2px solid #ef5350;
+  border: 2.5px solid #d32f2f;
   color: #b71c1c;
+  box-shadow: 0 4px 14px rgba(211, 47, 47, 0.15);
 }
 
 .alert-banner.advisory {
   background: #e8f5e9;
-  border: 2px solid #66bb6a;
+  border: 2.5px solid #43a047;
   color: #1b5e20;
 }
 
 .alert-banner h3 {
-  margin: 0 0 6px;
-  font-size: 18px;
+  margin: 0 0 8px;
+  font-size: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .alert-banner p {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
 }
 
 .causes-box, .care-box {
   background: var(--cream);
   border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 16px;
+  padding: 20px 24px;
+  margin-bottom: 18px;
 }
 
 .causes-box h4, .care-box h4 {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   font-size: 16px;
   color: var(--brown);
 }
 
-.causes-box pre, .care-box pre {
-  white-space: pre-wrap;
-  font-family: inherit;
+.causes-box ul, .care-box ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--brown);
   font-size: 14px;
   line-height: 1.6;
-  color: var(--brown-soft);
-  margin: 0;
 }
 
-.disclaimer {
-  margin-top: 24px;
-  font-size: 13px;
-  color: var(--brown-soft);
-  text-align: center;
-  line-height: 1.4;
-  border-top: 1px dashed #e0d2be;
-  padding-top: 16px;
+.causes-box li, .care-box li {
+  margin-bottom: 8px;
+}
+
+.prominent-disclaimer {
+  margin-top: 26px;
+  padding: 18px 20px;
+  background: #fff8e1;
+  border: 2px solid #ffe082;
+  border-radius: 10px;
+  font-size: 13.5px;
+  color: #5d4037;
+  line-height: 1.5;
+}
+
+.prominent-disclaimer strong {
+  color: #e65100;
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
 }
 
 .result { padding: 20px 20px 60px; text-align: center; }

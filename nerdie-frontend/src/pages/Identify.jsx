@@ -35,7 +35,9 @@ function Identify() {
     try {
       const formData = new FormData();
       if (file) {
+        // Append both 'photo' and 'image' to satisfy multer / specs
         formData.append("photo", file);
+        formData.append("image", file);
       }
       if (description.trim()) {
         formData.append("description", description.trim());
@@ -45,7 +47,7 @@ function Identify() {
       setResult(res);
     } catch (err) {
       console.error("Identification failed:", err);
-      setError(err.message || "Failed to identify bird. Please ensure the backend is running.");
+      setError(err.message || "Failed to identify bird. Please ensure backend is running.");
     } finally {
       setLoading(false);
     }
@@ -59,11 +61,13 @@ function Identify() {
     setError(null);
   }
 
+  const speciesDisplayName = result ? (result.species_name || result.species) : "";
+
   return (
     <>
       <div className="ihero">
-        <h1>Bird Identification</h1>
-        <p>Upload a photo or describe plumage, size, and markings to find an AI match.</p>
+        <h1>Gemini AI Bird Identification</h1>
+        <p>Upload a photo or describe plumage, size, and markings to identify bird species using Google Gen AI.</p>
       </div>
 
       <section className="identify">
@@ -88,10 +92,10 @@ function Identify() {
           </div>
 
           <div className="desc-input-group">
-            <label htmlFor="bird-desc">Or Describe Features (Optional if photo provided):</label>
+            <label htmlFor="bird-desc">Or Describe Features (Colors, Markings, Crest, Habitat):</label>
             <textarea
               id="bird-desc"
-              placeholder="e.g. Small yellow bird with crest, orange cheek patches, whistling sounds..."
+              placeholder="e.g. Small parrot with prominent yellow crest, bright orange cheek spots, and whistling habits..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -106,7 +110,7 @@ function Identify() {
               disabled={loading || (!file && !description.trim())}
               style={{ flex: 1 }}
             >
-              {loading ? "Analyzing features..." : "Identify Bird"}
+              {loading ? "Analyzing with Gemini AI..." : "Identify Bird"}
             </button>
             {(file || description || result) && (
               <button
@@ -123,55 +127,77 @@ function Identify() {
       </section>
 
       <section className="result">
-        <h2>Analysis Result</h2>
-        {!result && !loading && <p>Bird species match and rationale will appear here.</p>}
-        {loading && <p>Connecting to AI identification service & analyzing characteristics...</p>}
+        <h2>AI Analysis Results</h2>
+
+        {loading && (
+          <div className="loading-container">
+            <div className="spinner"></div>
+            <p style={{ margin: 0, fontWeight: 600 }}>Analyzing plumage and visual markers with Gemini AI...</p>
+          </div>
+        )}
+
+        {!result && !loading && (
+          <p>Bird species match, confidence score, and factual care profile will appear here.</p>
+        )}
 
         {result && (
           <div className="result-card">
             <div className="result-header">
-              <h3>{result.species}</h3>
-              <span className="confidence-badge">{result.confidence}% Match Confidence</span>
+              <h3>{speciesDisplayName}</h3>
+              <span className="confidence-badge">
+                Confidence: {result.confidence}
+              </span>
             </div>
 
             {result.image_url && (
               <img
                 src={getImageUrl(result.image_url)}
-                alt={result.species}
+                alt={speciesDisplayName}
                 className="result-img"
               />
             )}
 
-            <div className="result-rationale">
-              <strong>Identification Rationale:</strong>
-              <p>{result.rationale}</p>
+            <div className="result-description-box">
+              <strong>AI Physical Description & Rationale:</strong>
+              <p>{result.description || result.rationale}</p>
             </div>
+
+            {Array.isArray(result.fun_facts) && result.fun_facts.length > 0 && (
+              <div className="result-facts-box">
+                <h4>🪶 Fascinating Fun Facts:</h4>
+                <ul>
+                  {result.fun_facts.map((fact, idx) => (
+                    <li key={idx}>{fact}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="result-stats">
               <div className="result-stat-box">
-                <span>Family / Type</span>
-                <strong>{result.type}</strong>
+                <span>Natural Habitat</span>
+                <p>{result.habitat || "Arid and temperate woodlands"}</p>
               </div>
               <div className="result-stat-box">
-                <span>Typical Lifespan</span>
-                <strong>{result.lifespan || "Varies"}</strong>
+                <span>Recommended Diet</span>
+                <p>{result.diet || "Balanced formulated pellets & fresh greens"}</p>
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "10px" }}>
-              {result.species_id && (
-                <Link to={`/species/${result.species_id}`} style={{ flex: 1 }}>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+              {result.species_id ? (
+                <Link to={`/species/${result.species_id}`} style={{ flex: 1, minWidth: "180px" }}>
                   <button className="btn-primary" style={{ width: "100%" }}>
                     View Full Species Care Profile
                   </button>
                 </Link>
-              )}
+              ) : null}
               <Link
-                to={`/my-birds?species_id=${result.species_id}&species_name=${encodeURIComponent(result.species)}`}
-                style={{ flex: 1 }}
+                to={`/my-birds?species_name=${encodeURIComponent(speciesDisplayName)}${result.species_id ? `&species_id=${result.species_id}` : ''}`}
+                style={{ flex: 1, minWidth: "180px" }}
               >
                 <button className="btn-soft" style={{ width: "100%" }}>
-                  Save to My Birds
+                  + Add {speciesDisplayName} to My Birds
                 </button>
               </Link>
             </div>

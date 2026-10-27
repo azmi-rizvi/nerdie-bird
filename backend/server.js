@@ -10,6 +10,7 @@ const speciesRouter = require('./routes/species');
 const identificationRouter = require('./routes/identification');
 const symptomsRouter = require('./routes/symptoms');
 const userBirdsRouter = require('./routes/userBirds');
+const bondingRouter = require('./routes/bonding');
 
 const app = express();
 const DEFAULT_PORT = parseInt(process.env.PORT || '5001', 10);
@@ -60,6 +61,7 @@ app.use('/api/species', speciesRouter);
 app.use('/api/identify', identificationRouter);
 app.use('/api/symptoms', symptomsRouter);
 app.use('/api/my-birds', userBirdsRouter);
+app.use('/api/bonding-tip', bondingRouter);
 
 // 6. 404 Handler for undefined routes
 app.use((req, res) => {

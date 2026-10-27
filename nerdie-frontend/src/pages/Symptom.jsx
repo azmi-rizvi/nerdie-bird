@@ -15,7 +15,9 @@ const FALLBACK_SYMPTOMS = [
 
 function Symptom() {
   const [symptomsList, setSymptomsList] = useState(FALLBACK_SYMPTOMS);
+  const [birdSpecies, setBirdSpecies] = useState("");
   const [birdName, setBirdName] = useState("");
+  const [customSymptom, setCustomSymptom] = useState("");
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState(null);
@@ -45,8 +47,14 @@ function Symptom() {
 
   async function handleCheck(e) {
     if (e) e.preventDefault();
-    if (selectedSymptoms.length === 0) {
-      setError("Please select at least one symptom to evaluate.");
+
+    const allSymptoms = [...selectedSymptoms];
+    if (customSymptom.trim() && !allSymptoms.includes(customSymptom.trim())) {
+      allSymptoms.push(customSymptom.trim());
+    }
+
+    if (allSymptoms.length === 0) {
+      setError("Please select or type at least one symptom to evaluate.");
       return;
     }
 
@@ -56,7 +64,8 @@ function Symptom() {
 
     try {
       const data = await checkSymptoms({
-        symptoms: selectedSymptoms,
+        symptoms: allSymptoms,
+        species: birdSpecies.trim() || undefined,
         birdName: birdName.trim() || undefined
       });
       setResult(data);
@@ -70,31 +79,55 @@ function Symptom() {
 
   function handleReset() {
     setSelectedSymptoms([]);
+    setCustomSymptom("");
+    setBirdSpecies("");
     setBirdName("");
     setResult(null);
     setError(null);
   }
 
+  // Normalize causes and tips to arrays if returned as string
+  const causes = result
+    ? (Array.isArray(result.possible_causes) ? result.possible_causes : [result.possible_causes].filter(Boolean))
+    : [];
+  const tips = result
+    ? (Array.isArray(result.care_tips) ? result.care_tips : [result.care_tips].filter(Boolean))
+    : [];
+  const isEmergency = result ? Boolean(result.vet_emergency_flag || result.vet_emergency) : false;
+
   return (
     <>
       <div className="ihero">
-        <h1>Symptom Checker</h1>
-        <p>Select observed symptoms to evaluate possible causes and veterinary urgency.</p>
+        <h1>Gemini AI Symptom Checker</h1>
+        <p>Analyze observed avian health symptoms using Google Gen AI clinical evaluation.</p>
       </div>
 
       <section className="symptom">
         <h2>Avian Health Check</h2>
 
         <form onSubmit={handleCheck}>
-          <div className="symptom-input-group">
-            <label htmlFor="bird-name-input">Bird's Name (Optional):</label>
-            <input
-              id="bird-name-input"
-              type="text"
-              placeholder="e.g. Sunny, Pip, Kiwi..."
-              value={birdName}
-              onChange={(e) => setBirdName(e.target.value)}
-            />
+          <div className="symptom-form-row">
+            <div className="symptom-input-group">
+              <label htmlFor="bird-species-input">Bird Species / Type (e.g. Budgie, Cockatiel):</label>
+              <input
+                id="bird-species-input"
+                type="text"
+                placeholder="e.g. Budgie, African Grey, Canary..."
+                value={birdSpecies}
+                onChange={(e) => setBirdSpecies(e.target.value)}
+              />
+            </div>
+
+            <div className="symptom-input-group">
+              <label htmlFor="bird-name-input">Bird's Name (Optional):</label>
+              <input
+                id="bird-name-input"
+                type="text"
+                placeholder="e.g. Sunny, Pip, Kiwi..."
+                value={birdName}
+                onChange={(e) => setBirdName(e.target.value)}
+              />
+            </div>
           </div>
 
           <label className="checkboxes-label">Select Observed Symptoms (Check all that apply):</label>
@@ -113,11 +146,22 @@ function Symptom() {
                   />
                   <span>{item.symptom}</span>
                   {item.vet_emergency === 1 && (
-                    <span className="emergency-tag" title="Urgent medical indicator">Alert</span>
+                    <span className="emergency-tag" title="Critical symptom">Urgent</span>
                   )}
                 </label>
               );
             })}
+          </div>
+
+          <div className="symptom-input-group">
+            <label htmlFor="custom-symptom-input">Or Type Additional Observed Symptoms:</label>
+            <input
+              id="custom-symptom-input"
+              type="text"
+              placeholder="e.g. sneezing with discharge, clicking sounds while breathing, clicking beak..."
+              value={customSymptom}
+              onChange={(e) => setCustomSymptom(e.target.value)}
+            />
           </div>
 
           {error && <div style={{ color: "#c62828", marginBottom: "14px", fontWeight: "600" }}>⚠️ {error}</div>}
@@ -126,12 +170,12 @@ function Symptom() {
             <button
               type="submit"
               className="btn-primary"
-              disabled={selectedSymptoms.length === 0 || checking}
+              disabled={(selectedSymptoms.length === 0 && !customSymptom.trim()) || checking}
               style={{ flex: 1 }}
             >
-              {checking ? "Evaluating with Avian Health Database..." : `Analyze (${selectedSymptoms.length}) Symptoms`}
+              {checking ? "Analyzing with Gemini AI..." : "Analyze Symptoms with AI"}
             </button>
-            {(selectedSymptoms.length > 0 || result) && (
+            {(selectedSymptoms.length > 0 || customSymptom || result) && (
               <button
                 type="button"
                 className="btn-secondary"
@@ -146,44 +190,61 @@ function Symptom() {
 
         {result && (
           <div className="result-section">
-            <div className={`alert-banner ${result.vet_emergency ? "emergency" : "advisory"}`}>
+            <div className={`alert-banner ${isEmergency ? "emergency" : "advisory"}`}>
               <h3>
-                {result.vet_emergency ? "🚨 EMERGENCY ALERT: IMMEDIATE AVIAN VET CARE REQUIRED" : "ℹ️ HEALTH ADVISORY: HOME MONITORING"}
+                {isEmergency
+                  ? "🚨 CRITICAL: IMMEDIATE AVIAN VET MEDICAL ATTENTION REQUIRED"
+                  : "ℹ️ AVIAN HEALTH ADVISORY: HOME MONITORING"}
               </h3>
-              <p><strong>Evaluation for {result.bird_name}:</strong> {result.recommendation_summary}</p>
+              <p>
+                <strong>Evaluation for {result.bird_name || birdSpecies || "your bird"}:</strong>{" "}
+                {isEmergency
+                  ? "One or more reported symptoms represent an acute avian emergency. Birds conceal clinical signs until decompensation occurs. Contact a 24-hour emergency avian veterinarian immediately."
+                  : "These symptoms suggest a mild or early-stage concern. Follow supportive care steps and monitor closely for appetite or respiration changes."}
+              </p>
             </div>
 
             <div className="causes-box">
-              <h4>🩺 Possible Underlying Causes:</h4>
-              <pre>{result.possible_causes}</pre>
+              <h4>🩺 AI Possible Causes & Clinical Explanations:</h4>
+              <ul>
+                {causes.map((cause, idx) => (
+                  <li key={idx}>{cause}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="care-box">
-              <h4>🏡 First-Aid & Supportive Care Tips:</h4>
-              <pre>{result.care_tips}</pre>
+              <h4>🏡 Supportive Care & Home First-Aid Considerations:</h4>
+              <ul>
+                {tips.map((tip, idx) => (
+                  <li key={idx}>{tip}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="prominent-disclaimer">
+              <strong>⚠️ VETERINARY MEDICAL DISCLAIMER</strong>
+              {result.disclaimer ||
+                "Disclaimer: This tool provides general guidance only and is not a replacement for professional veterinary medical advice. Always consult a licensed avian veterinarian."}
             </div>
           </div>
         )}
-
-        <p className="disclaimer">
-          ⚠️ <strong>Medical Disclaimer:</strong> FeatherCare is an educational tool and does not provide formal medical diagnoses. Birds instinctively conceal illness until advanced. In case of sudden lethargy, bleeding, or breathing difficulty, always consult a licensed avian veterinarian immediately.
-        </p>
       </section>
 
       <section className="result">
-        <h2>Common Early Warning Signs</h2>
+        <h2>Common Avian Warning Signs</h2>
         <div className="card">
           <div className="b">
             <h3>Not Eating</h3>
-            <p>Loss of appetite or seed crumbling without swallowing can lead to hypoglycemia within 24-48 hours.</p>
-          </div>
-          <div className="b">
-            <h3>Feather Loss</h3>
-            <p>Watch for symmetrical plucking vs seasonal molting. Plucking often indicates boredom, diet, or mites.</p>
+            <p>Rapid avian metabolism means going 24 hours without eating can cause hepatic lipidosis and hypoglycemia.</p>
           </div>
           <div className="b">
             <h3>Tail Bobbing</h3>
-            <p>Rhythmic bobbing of the tail feathers while breathing signifies acute respiratory compromise.</p>
+            <p>Rhythmic bobbing of the tail feathers with breath cycles indicates acute respiratory compromise.</p>
+          </div>
+          <div className="b">
+            <h3>Fluffed on Cage Floor</h3>
+            <p>Sitting puffed at the bottom of the cage signifies hypothermia and severe illness.</p>
           </div>
         </div>
       </section>

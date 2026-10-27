@@ -106,15 +106,26 @@ export async function getSymptoms() {
   return request('/symptoms');
 }
 
-export async function checkSymptoms({ symptoms, birdName }) {
+export async function checkSymptoms({ symptoms, species, birdName }) {
   return request('/symptoms', {
     method: 'POST',
-    body: JSON.stringify({ symptoms, birdName })
+    body: JSON.stringify({ symptoms, species, birdName })
   });
 }
 
 // ==========================================
-// 4. My Birds CRUD API
+// 4. AI Bonding Activity API
+// ==========================================
+
+export async function getBondingTip({ species, age, notes, birdName }) {
+  return request('/bonding-tip', {
+    method: 'POST',
+    body: JSON.stringify({ species, age, notes, birdName })
+  });
+}
+
+// ==========================================
+// 5. My Birds CRUD API
 // ==========================================
 
 export async function getMyBirds() {
@@ -152,6 +163,7 @@ export default {
   identifyBird,
   getSymptoms,
   checkSymptoms,
+  getBondingTip,
   getMyBirds,
   getMyBirdById,
   createMyBird,
