@@ -68,7 +68,7 @@ function initDatabase() {
         "Extremely social and affectionate flock animals. Require at least 1-2 hours of direct interactive out-of-cage time daily to prevent loneliness or stress-related feather plucking.",
         "15 - 25 years",
         "Cockatiels express their mood using their crest feathers: upright when alert or curious, flattened flat against the head when defensive, and relaxed at a gentle 45-degree angle.",
-        "/uploads/species/cockatiel.jpg"
+        "/species/cockatiel.jpg"
       ],
       [
         "Budgerigar",
@@ -79,7 +79,7 @@ function initDatabase() {
         "Energetic, cheerful, and gregarious. They thrive when kept in pairs or given continuous vocal engagement, whistle routines, and companionship with their human flock.",
         "7 - 15 years",
         "A budgie holds the Guinness World Record for the largest vocabulary of any bird — a budgie named Puck knew over 1,700 words!",
-        "/uploads/species/budgerigar.jpg"
+        "/species/budgerigar.jpg"
       ],
       [
         "African Grey",
@@ -90,7 +90,7 @@ function initDatabase() {
         "Exceptionally high cognitive needs equivalent to a 4-to-5-year-old human child. Needs 3-4 hours of interactive play, mental puzzles, and structured companionship daily.",
         "40 - 60+ years",
         "African Greys can understand abstract concepts, count items, identify colors, and use syntax, famously demonstrated by Dr. Irene Pepperberg's research with Alex the Grey.",
-        "/uploads/species/african-grey.jpg"
+        "/species/african-grey.jpg"
       ],
       [
         "Lovebird",
@@ -101,7 +101,7 @@ function initDatabase() {
         "Intensely loyal, curious, and energetic. Contrary to myth, single lovebirds can thrive if bonded closely with a human companion who gives them daily attention.",
         "10 - 15 years",
         "Female peach-faced lovebirds tuck strips of bark, paper, and nesting material into their rump feathers to carry them back to build intricate nests!",
-        "/uploads/species/lovebird.jpg"
+        "/species/lovebird.jpg"
       ],
       [
         "Canary",
@@ -112,7 +112,7 @@ function initDatabase() {
         "Independent and territorial. Male canaries are renowned solitary singers and generally prefer being housed alone without cage mates.",
         "10 - 15 years",
         "Male canaries learn and reorganize their songs every single spring to attract mates, growing new brain neurons each breeding season.",
-        "/uploads/species/canary.jpg"
+        "/species/canary.jpg"
       ],
       [
         "Zebra Finch",
@@ -123,7 +123,7 @@ function initDatabase() {
         "Strict flock species — should never be kept alone. Always house in pairs or small peaceful colonies with plenty of space.",
         "5 - 10 years",
         "Zebra finches have distinctive 'beep-beep' trumpet-like calls and their courtship dance includes rhythmic beak wipes and puffing feathers.",
-        "/uploads/species/zebra-finch.png"
+        "/species/zebra-finch.png"
       ],
       [
         "Green-Cheeked Conure",
@@ -134,7 +134,7 @@ function initDatabase() {
         "Affectionate, goofy, and playful acrobats. Known as 'pocket clowns', they form very close cuddly bonds with their owners and enjoy gentle head scratches.",
         "20 - 30 years",
         "Green-cheeked conures are among the quietest of the conure family and love sleeping on their backs or hanging upside-down by one foot!",
-        "/uploads/species/green-cheeked-conure.jpg"
+        "/species/green-cheeked-conure.jpg"
       ],
       [
         "Barn Owl",
@@ -145,7 +145,7 @@ function initDatabase() {
         "Solitary or monogamous pairs in the wild. Sensitive to human disturbance and active nocturnally.",
         "4 - 15 years in wild, up to 20 in sanctuaries",
         "Barn owls have asymmetrical ear openings on the sides of their skull, allowing them to pinpoint sounds in complete pitch-black darkness.",
-        "/uploads/species/barn-owl.jpg"
+        "/species/barn-owl.jpg"
       ],
       [
         "Blue Jay",
@@ -156,7 +156,7 @@ function initDatabase() {
         "Complex social hierarchies, tight-knit family units, and highly communicative sentinels for forest wildlife.",
         "7 - 15 years in wild",
         "Blue Jays mimic red-shouldered hawk calls to warn other jays or to trick other birds into fleeing backyard feeding spots!",
-        "/uploads/species/blue-jay.jpg"
+        "/species/blue-jay.jpg"
       ]
     ];
 
@@ -165,6 +165,24 @@ function initDatabase() {
     });
     insertManySpecies(speciesSeedData);
     console.log(`Seeded ${speciesSeedData.length} bird species into database.`);
+  }
+
+  // Ensure species images point directly to frontend public species directory
+  const speciesImageMap = {
+    'Cockatiel': '/species/cockatiel.jpg',
+    'Budgerigar': '/species/budgerigar.jpg',
+    'African Grey': '/species/african-grey.jpg',
+    'Lovebird': '/species/lovebird.jpg',
+    'Canary': '/species/canary.jpg',
+    'Zebra Finch': '/species/zebra-finch.png',
+    'Green-Cheeked Conure': '/species/green-cheeked-conure.jpg',
+    'Barn Owl': '/species/barn-owl.jpg',
+    'Blue Jay': '/species/blue-jay.jpg'
+  };
+
+  const updateSpeciesImage = db.prepare('UPDATE species SET image_url = ? WHERE name = ?');
+  for (const [name, imageUrl] of Object.entries(speciesImageMap)) {
+    updateSpeciesImage.run(imageUrl, name);
   }
 
   // Seed Symptoms if table is empty

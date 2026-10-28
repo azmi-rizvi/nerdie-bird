@@ -8,10 +8,67 @@ const BACKEND_HOST = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 const API_BASE = `${BACKEND_HOST}/api`;
 
 /**
+ * Mapping of bird species names to local images in frontend public/species folder
+ */
+export const SPECIES_IMAGE_MAP = {
+  'cockatiel': '/species/cockatiel.jpg',
+  'budgerigar': '/species/budgerigar.jpg',
+  'budgie': '/species/budgerigar.jpg',
+  'african grey': '/species/african-grey.jpg',
+  'african grey parrot': '/species/african-grey.jpg',
+  'lovebird': '/species/lovebird.jpg',
+  'canary': '/species/canary.jpg',
+  'zebra finch': '/species/zebra-finch.png',
+  'green-cheeked conure': '/species/green-cheeked-conure.jpg',
+  'green cheeked conure': '/species/green-cheeked-conure.jpg',
+  'barn owl': '/species/barn-owl.jpg',
+  'blue jay': '/species/blue-jay.jpg',
+};
+
+/**
+ * Resolves species card image URL, giving first priority to the frontend public species folder.
+ */
+export function getSpeciesImageUrl(speciesName, path) {
+  if (typeof path === 'string' && path.trim()) {
+    const trimmedPath = path.trim();
+    if (trimmedPath.startsWith('/species/')) {
+      return trimmedPath;
+    }
+    if (trimmedPath.startsWith('/uploads/species/')) {
+      return trimmedPath.replace('/uploads/species/', '/species/');
+    }
+    if (trimmedPath.includes('/species/')) {
+      const filename = trimmedPath.split('/').pop();
+      return `/species/${filename}`;
+    }
+  }
+
+  if (speciesName && typeof speciesName === 'string') {
+    const key = speciesName.trim().toLowerCase();
+    if (SPECIES_IMAGE_MAP[key]) {
+      return SPECIES_IMAGE_MAP[key];
+    }
+    for (const [sKey, sUrl] of Object.entries(SPECIES_IMAGE_MAP)) {
+      if (key.includes(sKey) || sKey.includes(key)) {
+        return sUrl;
+      }
+    }
+  }
+
+  return getImageUrl(path);
+}
+
+/**
  * Helper to resolve static image URLs from the backend
  */
 export function getImageUrl(path) {
   if (!path) return '';
+  if (path.startsWith('/species/')) {
+    return path;
+  }
+  if (path.startsWith('/uploads/species/')) {
+    return path.replace('/uploads/species/', '/species/');
+  }
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }

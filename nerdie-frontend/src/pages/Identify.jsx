@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { identifyBird, getImageUrl } from "../services/api";
+import { identifyBird, getImageUrl, getSpeciesImageUrl } from "../services/api";
 import "./Identify.css";
 
 function Identify() {
@@ -188,9 +188,15 @@ function Identify() {
 
             {result.image_url && (
               <img
-                src={getImageUrl(result.image_url)}
+                src={getSpeciesImageUrl(speciesDisplayName, result.image_url)}
                 alt={speciesDisplayName}
                 className="result-img"
+                onError={(e) => {
+                  const fallback = getSpeciesImageUrl(speciesDisplayName);
+                  if (fallback && !e.target.src.endsWith(fallback)) {
+                    e.target.src = fallback;
+                  }
+                }}
               />
             )}
 

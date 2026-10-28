@@ -7,6 +7,7 @@ import {
   deleteMyBird,
   getSpecies,
   getImageUrl,
+  getSpeciesImageUrl,
   getBondingTip
 } from "../services/api";
 import mascot from "../assets/mascot-trans.png";
@@ -201,7 +202,7 @@ function MyBirds() {
         {!loading && !error && birds.length > 0 && (
           <div className="birds-grid">
             {birds.map((bird) => {
-              const displayImage = bird.species_image ? getImageUrl(bird.species_image) : mascot;
+              const displayImage = getSpeciesImageUrl(bird.species_name, bird.species_image) || mascot;
               return (
                 <div className="user-bird-card" key={bird.id}>
                   <div className="user-bird-img-frame">
@@ -214,8 +215,13 @@ function MyBirds() {
                       alt={bird.name}
                       className="user-bird-img"
                       onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = mascot;
+                        const fallback = getSpeciesImageUrl(bird.species_name);
+                        if (fallback && !e.target.src.endsWith(fallback)) {
+                          e.target.src = fallback;
+                        } else {
+                          e.target.onerror = null;
+                          e.target.src = mascot;
+                        }
                       }}
                     />
                   </div>

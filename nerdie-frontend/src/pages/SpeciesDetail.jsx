@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { getSpeciesById, getImageUrl } from "../services/api";
+import { getSpeciesById, getImageUrl, getSpeciesImageUrl } from "../services/api";
 import "./SpeciesDetail.css";
 
 function SpeciesDetail() {
@@ -56,16 +56,16 @@ function SpeciesDetail() {
           <div className="species-hero-frame">
             <div
               className="species-hero-backdrop"
-              style={{ backgroundImage: `url(${getImageUrl(species.image_url)})` }}
+              style={{ backgroundImage: `url(${getSpeciesImageUrl(species.name, species.image_url)})` }}
             />
             <img
-              src={getImageUrl(species.image_url)}
+              src={getSpeciesImageUrl(species.name, species.image_url)}
               alt={species.name}
               className="species-hero-img"
               onError={(e) => {
-                const filename = species.image_url ? species.image_url.split('/').pop() : '';
-                if (filename && !e.target.src.endsWith('/species/' + filename)) {
-                  e.target.src = `/species/${filename}`;
+                const fallback = getSpeciesImageUrl(species.name);
+                if (fallback && !e.target.src.endsWith(fallback)) {
+                  e.target.src = fallback;
                 }
               }}
             />

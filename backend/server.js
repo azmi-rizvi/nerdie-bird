@@ -44,8 +44,32 @@ app.use(cors({
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
-// 3. Static File Serving for Uploads
+// 3. Static File Serving for Uploads & Species
 app.use('/uploads', express.static(uploadsDir));
+
+const frontendSpeciesDir = path.join(__dirname, '..', 'nerdie-frontend', 'public', 'species');
+const backendSpeciesDir = path.join(uploadsDir, 'species');
+if (!fs.existsSync(backendSpeciesDir)) {
+  fs.mkdirSync(backendSpeciesDir, { recursive: true });
+}
+
+if (fs.existsSync(frontendSpeciesDir)) {
+  app.use('/species', express.static(frontendSpeciesDir));
+  app.use('/uploads/species', express.static(frontendSpeciesDir));
+
+  try {
+    const files = fs.readdirSync(frontendSpeciesDir);
+    for (const file of files) {
+      const srcFile = path.join(frontendSpeciesDir, file);
+      const destFile = path.join(backendSpeciesDir, file);
+      if (!fs.existsSync(destFile) && fs.statSync(srcFile).isFile()) {
+        fs.copyFileSync(srcFile, destFile);
+      }
+    }
+  } catch (e) {
+    console.warn('Could not sync species images to uploads/species:', e.message);
+  }
+}
 
 // 4. API Status & Health Check
 app.get('/api', (req, res) => {

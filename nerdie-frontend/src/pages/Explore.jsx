@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { getSpecies, getSpeciesTypes, getImageUrl } from "../services/api";
+import { getSpecies, getSpeciesTypes, getImageUrl, getSpeciesImageUrl } from "../services/api";
 import "./Explore.css";
 
 function Explore() {
@@ -124,16 +124,16 @@ function Explore() {
                   <>
                     <div
                       className="bird-backdrop"
-                      style={{ backgroundImage: `url(${getImageUrl(b.image_url)})` }}
+                      style={{ backgroundImage: `url(${getSpeciesImageUrl(b.name, b.image_url)})` }}
                     />
                     <img
-                      src={getImageUrl(b.image_url)}
+                      src={getSpeciesImageUrl(b.name, b.image_url)}
                       alt={b.name}
                       className="bird-img"
                       onError={(e) => {
-                        const filename = b.image_url ? b.image_url.split('/').pop() : '';
-                        if (filename && !e.target.src.endsWith('/species/' + filename)) {
-                          e.target.src = `/species/${filename}`;
+                        const fallback = getSpeciesImageUrl(b.name);
+                        if (fallback && !e.target.src.endsWith(fallback)) {
+                          e.target.src = fallback;
                         } else {
                           e.target.style.display = 'none';
                         }
@@ -186,16 +186,16 @@ function Explore() {
               <div className="modal-header-frame">
                 <div
                   className="modal-header-backdrop"
-                  style={{ backgroundImage: `url(${getImageUrl(selectedSpecies.image_url)})` }}
+                  style={{ backgroundImage: `url(${getSpeciesImageUrl(selectedSpecies.name, selectedSpecies.image_url)})` }}
                 />
                 <img
-                  src={getImageUrl(selectedSpecies.image_url)}
+                  src={getSpeciesImageUrl(selectedSpecies.name, selectedSpecies.image_url)}
                   alt={selectedSpecies.name}
                   className="modal-header-img"
                   onError={(e) => {
-                    const filename = selectedSpecies.image_url ? selectedSpecies.image_url.split('/').pop() : '';
-                    if (filename && !e.target.src.endsWith('/species/' + filename)) {
-                      e.target.src = `/species/${filename}`;
+                    const fallback = getSpeciesImageUrl(selectedSpecies.name);
+                    if (fallback && !e.target.src.endsWith(fallback)) {
+                      e.target.src = fallback;
                     }
                   }}
                 />

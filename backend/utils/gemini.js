@@ -42,6 +42,35 @@ function withTimeout(promise, ms = 20000) {
   return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timer));
 }
 
+class GeminiServiceError extends Error {
+  constructor(code, message, status = 500) {
+    super(message);
+    this.name = 'GeminiServiceError';
+    this.code = code;
+    this.status = status;
+  }
+}
+
+function toGeminiServiceError(error) {
+  if (error instanceof GeminiServiceError) {
+    return error;
+  }
+  const msg = error?.message || '';
+  if (msg.includes('resource_exhausted') || msg.includes('quota') || msg.includes('429')) {
+    return new GeminiServiceError('RATE_LIMIT_EXCEEDED', 'Gemini AI rate limit reached. Please wait a moment and try again.', 429);
+  }
+  if (msg.includes('API key not valid') || msg.includes('AI_NOT_CONFIGURED')) {
+    return new GeminiServiceError('AI_NOT_CONFIGURED', 'Invalid or missing GEMINI_API_KEY in the backend environment.', 503);
+  }
+  if (error?.name === 'TimeoutError' || error?.code === 'TIMEOUT' || msg.includes('timeout')) {
+    return new GeminiServiceError('TIMEOUT', 'Gemini AI operation timed out.', 504);
+  }
+  if (error?.code === 'MALFORMED_RESPONSE') {
+    return new GeminiServiceError('MALFORMED_RESPONSE', 'Invalid response received from Gemini AI.', 502);
+  }
+  return new GeminiServiceError('AI_PROVIDER_ERROR', 'Gemini AI provider encountered an error.', 502);
+}
+
 /**
  * Robust JSON extraction helper from AI text response
  */
@@ -79,7 +108,9 @@ function extractJSON(text) {
       } catch (err) {}
     }
 
-    throw new Error('Could not parse valid JSON from AI response: ' + cleaned.substring(0, 150));
+    const err = new Error('Could not parse valid JSON from AI response.');
+    err.code = 'MALFORMED_RESPONSE';
+    throw err;
   }
 }
 
@@ -87,9 +118,12 @@ function extractJSON(text) {
  * Generate AI content with automatic model fallback
  */
 async function generateAIContent({ contents, responseMimeType = 'application/json', responseSchema, systemInstruction, timeoutMs = 20000 }) {
-  if (!ai) {
-    const error = new Error('Gemini AI client is not initialized. Please verify GEMINI_API_KEY in .env.');
-    error.status = 500;
+  if (!ai || !apiKey) {
+    const error = new GeminiServiceError(
+      'AI_NOT_CONFIGURED',
+      'Gemini AI is not configured. Set GEMINI_API_KEY in the backend environment.',
+      503
+    );
     throw error;
   }
 
@@ -162,8 +196,11 @@ function sendGeminiError(res, error) {
   });
 }
 
-module.exports = ai;
-module.exports.ai = ai;
-module.exports.generateAIContent = generateAIContent;
-module.exports.extractJSON = extractJSON;
-module.exports.sendGeminiError = sendGeminiError;
+module.exports = {
+  ai,
+  generateAIContent,
+  extractJSON,
+  sendGeminiError,
+  toGeminiServiceError,
+  GeminiServiceError
+};
