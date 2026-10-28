@@ -77,6 +77,9 @@ export const SPECIES_IMAGE_MAP = {
 export function getSpeciesImageUrl(speciesName, path) {
   if (typeof path === 'string' && path.trim()) {
     const trimmedPath = path.trim();
+    if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
+      return trimmedPath;
+    }
     if (trimmedPath.startsWith('/species/')) {
       return trimmedPath;
     }
@@ -86,6 +89,9 @@ export function getSpeciesImageUrl(speciesName, path) {
     if (trimmedPath.includes('/species/')) {
       const filename = trimmedPath.split('/').pop();
       return `/species/${filename}`;
+    }
+    if (trimmedPath.startsWith('/uploads')) {
+      return getImageUrl(trimmedPath);
     }
   }
 

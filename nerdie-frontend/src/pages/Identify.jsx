@@ -12,6 +12,7 @@ function Identify() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  const fileInputRef = useRef(null);
   const resultRef = useRef(null);
 
   useEffect(() => () => {
@@ -57,6 +58,22 @@ function Identify() {
     }
   }
 
+  function handleRemoveFile(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+    setFile(null);
+    setPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    setError(null);
+  }
+
   async function handleIdentify(e) {
     if (e) e.preventDefault();
     if (!file && !description.trim()) {
@@ -88,17 +105,17 @@ function Identify() {
   }
 
   function handleReset() {
-    setFile(null);
-    setPreview(null);
+    handleRemoveFile();
     setDescription("");
     setResult(null);
     setError(null);
   }
 
   const speciesDisplayName = result ? (result.species_name || result.species) : "";
-  const resultDisplayImg = result
-    ? (getSpeciesImageUrl(speciesDisplayName, result.image_url) || result.image_url || mascot)
-    : mascot;
+  const rawReturnedImg = result ? (result.image_url || result.gemini_image_url || result.local_image_url) : null;
+  const resultDisplayImg = rawReturnedImg
+    ? (getSpeciesImageUrl(speciesDisplayName, rawReturnedImg) || rawReturnedImg)
+    : (result ? getSpeciesImageUrl(speciesDisplayName) : mascot);
 
   return (
     <>
@@ -111,21 +128,78 @@ function Identify() {
         <h2>Identify a Bird</h2>
 
         <form onSubmit={handleIdentify} className="identify-form">
-          <div className="upload-dropzone">
-            <label htmlFor="bird-file-input" className="dropzone-label">
-              <span className="dropzone-icon">📷</span>
-              <strong>{file ? file.name : "Click to select or upload a bird photo"}</strong>
-              <p style={{ margin: "6px 0 0", fontSize: "12px", color: "var(--brown-soft)" }}>
-                Supports JPG, PNG, WEBP (Up to 10MB)
-              </p>
-            </label>
+          <div
+            className={`upload-dropzone ${file ? "has-file" : ""}`}
+            onClick={() => {
+              if (!file && fileInputRef.current) {
+                fileInputRef.current.click();
+              }
+            }}
+          >
             <input
+              ref={fileInputRef}
               id="bird-file-input"
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={handleFileChange}
             />
-            {preview && <img src={preview} alt="Bird Preview" className="preview-img" />}
+
+            {!file ? (
+              <label htmlFor="bird-file-input" className="dropzone-label">
+                <span className="dropzone-icon">📷</span>
+                <strong>Click to select or upload a bird photo</strong>
+                <p style={{ margin: "6px 0 0", fontSize: "12px", color: "var(--brown-soft)" }}>
+                  Supports JPG, PNG, WEBP (Up to 10MB)
+                </p>
+              </label>
+            ) : (
+              <div className="preview-container" onClick={(e) => e.stopPropagation()}>
+                <div className="preview-header-bar">
+                  <span className="preview-filename">📷 {file.name}</span>
+                  <button
+                    type="button"
+                    className="btn-cross-remove"
+                    onClick={handleRemoveFile}
+                    title="Remove uploaded image"
+                    aria-label="Remove uploaded image"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {preview && (
+                  <div className="preview-img-wrapper">
+                    <img src={preview} alt="Bird Preview" className="preview-img" />
+                    <button
+                      type="button"
+                      className="preview-img-close-btn"
+                      onClick={handleRemoveFile}
+                      title="Remove uploaded image"
+                      aria-label="Remove image"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
+                <div className="preview-action-row">
+                  <button
+                    type="button"
+                    className="btn-change-photo"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    🔄 Change Photo
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-remove-photo-text"
+                    onClick={handleRemoveFile}
+                  >
+                    ✕ Remove Image
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="desc-input-group">
@@ -171,7 +245,7 @@ function Identify() {
           <div className="ai-loading-card" ref={resultRef}>
             <div className="ai-spinner"></div>
             <div className="ai-loading-text">
-              <h3>Analyzing with Gemini Multimodal AI...</h3>
+              <h3>Analyzing with Gemini AI...</h3>
               <p>Examining plumage patterns, beak geometry, and physical markers to identify the species. Please wait a moment.</p>
             </div>
           </div>
@@ -186,28 +260,46 @@ function Identify() {
             <div className="result-header">
               <div>
                 <h3>{speciesDisplayName}</h3>
-                {result.type && <span className="modal-tag" style={{ marginTop: '4px', display: 'inline-block' }}>{result.type}</span>}
+                {result.scientific_name && (
+                  <div style={{ color: "#0d9488", fontStyle: "italic", fontWeight: 600, fontSize: "0.95rem", marginTop: "2px" }}>
+                    {result.scientific_name}
+                  </div>
+                )}
+                <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap", marginTop: "6px" }}>
+                  {result.type && <span className="modal-tag">{result.type}</span>}
+                  {result.auto_saved_to_db && (
+                    <span className="discover-badge-pill">
+                      ✨ Auto-Added to Species Catalog (#{result.species_id})
+                    </span>
+                  )}
+                </div>
               </div>
               <span className="confidence-badge">
                 Confidence: {result.confidence}
               </span>
             </div>
 
-            {/* Feature 3: Prominent Bird Image Display with ambient framed showcase */}
+            {/* Feature: Prominent Bird Image Display with ambient framed showcase */}
             <div className="result-img-frame">
-              <div
-                className="result-img-backdrop"
-                style={{ backgroundImage: `url(${resultDisplayImg})` }}
-              />
+              {resultDisplayImg && (
+                <div
+                  className="result-img-backdrop"
+                  style={{ backgroundImage: `url("${resultDisplayImg}")` }}
+                />
+              )}
               <img
-                src={resultDisplayImg}
+                src={resultDisplayImg || mascot}
                 alt={speciesDisplayName}
                 className="result-img"
+                referrerPolicy="no-referrer"
+                crossOrigin="anonymous"
+                loading="eager"
                 onError={(e) => {
-                  const fallback = getSpeciesImageUrl(speciesDisplayName) || mascot;
-                  if (fallback && !e.target.src.endsWith(fallback)) {
-                    e.target.src = fallback;
-                  } else {
+                  console.warn("Primary image load failed for:", e.target.src);
+                  const candidateFallback = result?.local_image_url || result?.gemini_image_url || getSpeciesImageUrl(speciesDisplayName);
+                  if (candidateFallback && e.target.src !== candidateFallback && !e.target.src.endsWith(candidateFallback)) {
+                    e.target.src = candidateFallback;
+                  } else if (!e.target.src.endsWith(mascot)) {
                     e.target.src = mascot;
                   }
                 }}
@@ -241,7 +333,7 @@ function Identify() {
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "20px" }}>
               {result.species_id ? (
                 <Link to={`/species/${result.species_id}`} style={{ flex: 1, minWidth: "180px" }}>
                   <button className="btn-primary" style={{ width: "100%" }}>
