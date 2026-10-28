@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   getMyBirds,
@@ -35,6 +35,7 @@ function MyBirds() {
   const [formAge, setFormAge] = useState("");
   const [formNotes, setFormNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const hasConsumedPrefill = useRef(false);
 
   // Load birds & species on mount
   useEffect(() => {
@@ -43,7 +44,8 @@ function MyBirds() {
 
   // If prefilled from Explore page, automatically open the modal
   useEffect(() => {
-    if (prefillSpeciesId && speciesList.length > 0) {
+    if (prefillSpeciesId && speciesList.length > 0 && !hasConsumedPrefill.current) {
+      hasConsumedPrefill.current = true;
       setFormSpeciesId(prefillSpeciesId);
       setIsModalOpen(true);
     }
@@ -110,6 +112,12 @@ function MyBirds() {
   function handleCloseModal() {
     setIsModalOpen(false);
     setEditingBird(null);
+    setFormName("");
+    setFormAge("");
+    setFormNotes("");
+    if (searchParams.get("species_id") || searchParams.get("species_name")) {
+      setSearchParams({}, { replace: true });
+    }
   }
 
   async function handleSaveBird(e) {
