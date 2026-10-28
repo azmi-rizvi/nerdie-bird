@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { getSpecies, getSpeciesTypes, getImageUrl, getSpeciesImageUrl } from "../services/api";
+import {
+  getSpecies,
+  getSpeciesTypes,
+  getImageUrl,
+  getSpeciesImageUrl,
+  discoverNewBird
+} from "../services/api";
 import "./Explore.css";
 
 function Explore() {
@@ -14,8 +20,15 @@ function Explore() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedSpecies, setSelectedSpecies] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Load available types on mount
+  // AI Discover State
+  const [isDiscovering, setIsDiscovering] = useState(false);
+  const [discoveredBird, setDiscoveredBird] = useState(null);
+  const [discoverError, setDiscoverError] = useState(null);
+  const [isDiscoverModalOpen, setIsDiscoverModalOpen] = useState(false);
+
+  // Load available types on mount or refresh
   useEffect(() => {
     async function loadTypes() {
       try {
@@ -23,11 +36,11 @@ function Explore() {
         setTypes(fetchedTypes);
       } catch (err) {
         console.warn("Could not load dynamic types, using defaults:", err);
-        setTypes(["All", "Parrots", "Finches", "Wild Birds"]);
+        setTypes(["All", "Parrots", "Finches", "Wild Birds", "Raptors", "Waterfowl", "Softbills", "Pigeons & Doves"]);
       }
     }
     loadTypes();
-  }, []);
+  }, [refreshKey]);
 
   // Sync state if URL query changes
   useEffect(() => {
@@ -35,7 +48,7 @@ function Explore() {
     setQuery(urlSearch);
   }, [searchParams]);
 
-  // Fetch species whenever query or filter changes
+  // Fetch species whenever query, filter, or refreshKey changes
   useEffect(() => {
     let isCancelled = false;
     async function fetchSpeciesData() {
@@ -63,7 +76,7 @@ function Explore() {
       isCancelled = true;
       clearTimeout(timer);
     };
-  }, [query, filter]);
+  }, [query, filter, refreshKey]);
 
   function handleSearchChange(e) {
     const val = e.target.value;
@@ -79,11 +92,49 @@ function Explore() {
     setFilter(t);
   }
 
+  async function handleTriggerDiscover() {
+    setIsDiscovering(true);
+    setDiscoverError(null);
+    setDiscoveredBird(null);
+    setIsDiscoverModalOpen(true);
+
+    try {
+      const newBird = await discoverNewBird();
+      setDiscoveredBird(newBird);
+    } catch (err) {
+      console.error("AI Bird Discovery Error:", err);
+      setDiscoverError(err.message || "Failed to generate bird with Gemini AI. Please try again.");
+    } finally {
+      setIsDiscovering(false);
+    }
+  }
+
+  function handleCloseDiscoverModal() {
+    setIsDiscoverModalOpen(false);
+    // Dynamically refresh main list so newly discovered bird instantly appears in grid
+    if (discoveredBird) {
+      setRefreshKey((k) => k + 1);
+    }
+    setDiscoveredBird(null);
+    setDiscoverError(null);
+  }
+
   return (
     <>
       <div className="head">
         <h1>Explore Birds</h1>
         <p>Discover different bird species, dietary habits, and care setups.</p>
+        
+        {/* Feature 1: Prominent Discover New Bird Trigger */}
+        <div className="discover-banner-btn-wrap">
+          <button
+            className="btn-primary btn-discover"
+            onClick={handleTriggerDiscover}
+            disabled={isDiscovering}
+          >
+            {isDiscovering ? "✨ Gemini AI Discovering Bird..." : "✨ Discover New Bird"}
+          </button>
+        </div>
       </div>
 
       <div className="esearch">
@@ -110,7 +161,7 @@ function Explore() {
       {error && (
         <div className="error-state">
           <p>⚠️ Error connecting to database: {error}</p>
-          <button className="btn-secondary" onClick={() => setQuery(query)}>Retry</button>
+          <button className="btn-secondary" onClick={() => setRefreshKey((k) => k + 1)}>Retry</button>
         </div>
       )}
 
@@ -177,7 +228,119 @@ function Explore() {
         </div>
       )}
 
-      {/* Species Detail Modal */}
+      {/* Feature 1: AI Discover New Bird Modal */}
+      {isDiscoverModalOpen && (
+        <div className="modal-overlay" onClick={handleCloseDiscoverModal}>
+          <div className="modal-content discover-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={handleCloseDiscoverModal}>×</button>
+
+            {isDiscovering && (
+              <div className="ai-loading-card" style={{ margin: "40px 20px" }}>
+                <div className="ai-spinner"></div>
+                <div className="ai-loading-text">
+                  <h3>Generating New Species with Gemini AI...</h3>
+                  <p>Consulting avian biology databases to discover a unique, scientifically recognized bird species not yet in our catalog. Auto-saving to database...</p>
+                </div>
+              </div>
+            )}
+
+            {discoverError && (
+              <div style={{ padding: "40px 28px", textAlign: "center" }}>
+                <div style={{ fontSize: "40px", marginBottom: "12px" }}>⚠️</div>
+                <h3 style={{ color: "#c62828", margin: "0 0 10px" }}>AI Discovery Encountered an Issue</h3>
+                <p style={{ color: "var(--brown-soft)", marginBottom: "20px" }}>{discoverError}</p>
+                <button className="btn-primary" onClick={handleTriggerDiscover}>Try Again</button>
+              </div>
+            )}
+
+            {discoveredBird && (
+              <>
+                {discoveredBird.image_url && (
+                  <div className="modal-header-frame">
+                    <div
+                      className="modal-header-backdrop"
+                      style={{ backgroundImage: `url(${getSpeciesImageUrl(discoveredBird.name, discoveredBird.image_url)})` }}
+                    />
+                    <img
+                      src={getSpeciesImageUrl(discoveredBird.name, discoveredBird.image_url)}
+                      alt={discoveredBird.name}
+                      className="modal-header-img"
+                      onError={(e) => {
+                        const fallback = getSpeciesImageUrl(discoveredBird.name);
+                        if (fallback && !e.target.src.endsWith(fallback)) {
+                          e.target.src = fallback;
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div className="modal-body">
+                  <div className="modal-title-row">
+                    <div>
+                      <h2>{discoveredBird.name}</h2>
+                      <span className="discover-badge-pill">✨ Auto-Saved to Catalog (#{discoveredBird.id})</span>
+                    </div>
+                    <span className="modal-tag">{discoveredBird.type}</span>
+                  </div>
+
+                  <div className="modal-grid">
+                    <div className="modal-field">
+                      <label>Natural Habitat</label>
+                      <p>{discoveredBird.habitat || "Information not specified"}</p>
+                    </div>
+                    <div className="modal-field">
+                      <label>Typical Lifespan</label>
+                      <p>{discoveredBird.lifespan || "Information not specified"}</p>
+                    </div>
+                    <div className="modal-field full">
+                      <label>Recommended Nutritional Diet</label>
+                      <p>{discoveredBird.diet || "Information not specified"}</p>
+                    </div>
+                    <div className="modal-field full">
+                      <label>Cage & Environmental Setup</label>
+                      <p>{discoveredBird.cage_setup || "Information not specified"}</p>
+                    </div>
+                    <div className="modal-field full">
+                      <label>Social & Behavioral Needs</label>
+                      <p>{discoveredBird.social_needs || "Information not specified"}</p>
+                    </div>
+                    <div className="modal-field full">
+                      <label>Fascinating Fun Facts</label>
+                      <p>{discoveredBird.fun_facts || "Information not specified"}</p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "10px", marginTop: "24px", flexWrap: "wrap" }}>
+                    <Link to={`/species/${discoveredBird.id}`} style={{ flex: 1, minWidth: "160px" }}>
+                      <button className="btn-primary" style={{ width: "100%" }}>
+                        View Full Species Page
+                      </button>
+                    </Link>
+                    <Link
+                      to={`/my-birds?species_id=${discoveredBird.id}&species_name=${encodeURIComponent(discoveredBird.name)}`}
+                      style={{ flex: 1, minWidth: "160px" }}
+                    >
+                      <button className="btn-soft" style={{ width: "100%" }}>
+                        + Add to My Birds
+                      </button>
+                    </Link>
+                    <button
+                      className="btn-secondary"
+                      onClick={handleCloseDiscoverModal}
+                      style={{ minWidth: "140px" }}
+                    >
+                      Close & View in List
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Species Detail Modal (Quick View) */}
       {selectedSpecies && (
         <div className="modal-overlay" onClick={() => setSelectedSpecies(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

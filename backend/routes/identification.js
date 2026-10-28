@@ -14,6 +14,19 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// Fallback high-resolution Unsplash images by species category
+const CATEGORY_FALLBACK_IMAGES = {
+  'Parrots': 'https://images.unsplash.com/photo-1555169062-013468b47731?auto=format&fit=crop&w=800&q=80',
+  'Finches': 'https://images.unsplash.com/photo-1549608276-5786777e6587?auto=format&fit=crop&w=800&q=80',
+  'Canaries': 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',
+  'Raptors': 'https://images.unsplash.com/photo-1611689342806-0863700ce1e4?auto=format&fit=crop&w=800&q=80',
+  'Wild Birds': 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
+  'Waterfowl': 'https://images.unsplash.com/photo-1563281577-a7be47e20db9?auto=format&fit=crop&w=800&q=80',
+  'Softbills': 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?auto=format&fit=crop&w=800&q=80',
+  'Pigeons & Doves': 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80',
+  'Default': 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80'
+};
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: MAX_IMAGE_SIZE, files: 2 },
@@ -118,7 +131,8 @@ Respond with ONLY a valid JSON object matching this schema:
     "Interesting behavioral or biological fact 2"
   ],
   "habitat": "Natural geographic origin and wild habitat",
-  "diet": "Recommended domestic diet (pellets, seeds, greens) or natural wild diet"
+  "diet": "Recommended domestic diet (pellets, seeds, greens) or natural wild diet",
+  "image_url": "A high-quality Unsplash image URL matching the identified species (e.g. https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80)"
 }`;
 
   contents.push(promptText);
@@ -158,6 +172,7 @@ Respond with ONLY a valid JSON object matching this schema:
         fun_facts: [matchedDb.fun_facts, `Social needs: ${matchedDb.social_needs}`],
         habitat: matchedDb.habitat,
         diet: matchedDb.diet,
+        image_url: matchedDb.image_url,
         fallback: true
       };
       modelUsed = 'database-fallback';
@@ -169,7 +184,7 @@ Respond with ONLY a valid JSON object matching this schema:
 
   const speciesName = (aiResult.species_name || 'Unknown Bird').trim();
 
-  // Check if species exists in local database to attach species_id
+  // Check if species exists in local database to attach species_id & fallback photo
   const dbSpecies = db.prepare(`
     SELECT * FROM species
     WHERE LOWER(name) = LOWER(?) OR LOWER(name) LIKE LOWER(?)
@@ -179,6 +194,19 @@ Respond with ONLY a valid JSON object matching this schema:
   const funFactsArray = Array.isArray(aiResult.fun_facts)
     ? aiResult.fun_facts
     : [aiResult.fun_facts].filter(Boolean);
+
+  // Guarantee that image_url is ALWAYS populated with a working image
+  let finalImageUrl = uploadedImageUrl;
+  if (!finalImageUrl && dbSpecies?.image_url) {
+    finalImageUrl = dbSpecies.image_url;
+  }
+  if (!finalImageUrl && typeof aiResult.image_url === 'string' && aiResult.image_url.startsWith('http')) {
+    finalImageUrl = aiResult.image_url;
+  }
+  if (!finalImageUrl) {
+    const category = dbSpecies?.type || 'Default';
+    finalImageUrl = CATEGORY_FALLBACK_IMAGES[category] || CATEGORY_FALLBACK_IMAGES['Default'];
+  }
 
   return res.json({
     species_name: speciesName,
@@ -190,7 +218,7 @@ Respond with ONLY a valid JSON object matching this schema:
     species: speciesName,
     species_id: dbSpecies?.id || null,
     rationale: aiResult.description,
-    image_url: uploadedImageUrl || dbSpecies?.image_url || null,
+    image_url: finalImageUrl,
     type: dbSpecies?.type || 'Companion Bird',
     ai_generated: !aiResult.fallback,
     ai_model: modelUsed

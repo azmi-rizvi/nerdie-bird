@@ -132,6 +132,15 @@ export async function getSpeciesTypes() {
   return request('/species/types');
 }
 
+/**
+ * AI-powered Discover New Bird generator
+ */
+export async function discoverNewBird() {
+  return request('/species/discover', {
+    method: 'POST'
+  });
+}
+
 // ==========================================
 // 2. Bird Identification API
 // ==========================================
@@ -217,6 +226,7 @@ export default {
   getSpecies,
   getSpeciesById,
   getSpeciesTypes,
+  discoverNewBird,
   identifyBird,
   getSymptoms,
   checkSymptoms,

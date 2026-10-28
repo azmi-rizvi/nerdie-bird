@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { identifyBird, getImageUrl, getSpeciesImageUrl } from "../services/api";
+import mascot from "../assets/mascot-trans.png";
 import "./Identify.css";
 
 function Identify() {
@@ -95,6 +96,9 @@ function Identify() {
   }
 
   const speciesDisplayName = result ? (result.species_name || result.species) : "";
+  const resultDisplayImg = result
+    ? (getSpeciesImageUrl(speciesDisplayName, result.image_url) || result.image_url || mascot)
+    : mascot;
 
   return (
     <>
@@ -180,25 +184,35 @@ function Identify() {
         {result && (
           <div className="result-card" ref={resultRef}>
             <div className="result-header">
-              <h3>{speciesDisplayName}</h3>
+              <div>
+                <h3>{speciesDisplayName}</h3>
+                {result.type && <span className="modal-tag" style={{ marginTop: '4px', display: 'inline-block' }}>{result.type}</span>}
+              </div>
               <span className="confidence-badge">
                 Confidence: {result.confidence}
               </span>
             </div>
 
-            {result.image_url && (
+            {/* Feature 3: Prominent Bird Image Display with ambient framed showcase */}
+            <div className="result-img-frame">
+              <div
+                className="result-img-backdrop"
+                style={{ backgroundImage: `url(${resultDisplayImg})` }}
+              />
               <img
-                src={getSpeciesImageUrl(speciesDisplayName, result.image_url)}
+                src={resultDisplayImg}
                 alt={speciesDisplayName}
                 className="result-img"
                 onError={(e) => {
-                  const fallback = getSpeciesImageUrl(speciesDisplayName);
+                  const fallback = getSpeciesImageUrl(speciesDisplayName) || mascot;
                   if (fallback && !e.target.src.endsWith(fallback)) {
                     e.target.src = fallback;
+                  } else {
+                    e.target.src = mascot;
                   }
                 }}
               />
-            )}
+            </div>
 
             <div className="result-description-box">
               <strong>AI Physical Description & Rationale:</strong>

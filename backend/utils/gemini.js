@@ -19,8 +19,9 @@ if (!apiKey) {
 
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
-// High-speed Flash models with verified 1-second response times
+// High-speed Flash models with verified fast response times
 const CANDIDATE_MODELS = [
+  'gemini-2.5-flash',
   'gemini-flash-lite-latest',
   'gemini-3.1-flash-lite',
   'gemini-3.8-flash'
