@@ -21,9 +21,16 @@ function initDatabase() {
       social_needs TEXT,
       lifespan TEXT,
       fun_facts TEXT,
-      image_url TEXT
+      image_url TEXT,
+      scientific_name TEXT
     );
   `);
+
+  try {
+    db.exec(`ALTER TABLE species ADD COLUMN scientific_name TEXT;`);
+  } catch (e) {
+    // Column already exists
+  }
 
   // 2. User Birds table
   db.exec(`

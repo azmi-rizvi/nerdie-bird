@@ -197,6 +197,11 @@ function Explore() {
                 <div className="bird-header-row">
                   <h2>{b.name}</h2>
                 </div>
+                {b.scientific_name && (
+                  <div style={{ color: "#6b7280", fontStyle: "italic", fontSize: "0.85rem", marginTop: "-4px", marginBottom: "8px" }}>
+                    {b.scientific_name}
+                  </div>
+                )}
                 <div className="bird-quick-stats">
                   <span className="stat-pill">⏳ <strong>Lifespan:</strong> {b.lifespan || "Varies"}</span>
                   {b.habitat && (
@@ -279,6 +284,11 @@ function Explore() {
                   <div className="modal-title-row">
                     <div>
                       <h2>{discoveredBird.name}</h2>
+                      {discoveredBird.scientific_name && (
+                        <div style={{ color: "#0d9488", fontStyle: "italic", fontWeight: 600, fontSize: "0.95rem", marginBottom: "4px" }}>
+                          {discoveredBird.scientific_name}
+                        </div>
+                      )}
                       <span className="discover-badge-pill">✨ Auto-Saved to Catalog (#{discoveredBird.id})</span>
                     </div>
                     <span className="modal-tag">{discoveredBird.type}</span>
@@ -366,7 +376,14 @@ function Explore() {
             )}
             <div className="modal-body">
               <div className="modal-title-row">
-                <h2>{selectedSpecies.name}</h2>
+                <div>
+                  <h2>{selectedSpecies.name}</h2>
+                  {selectedSpecies.scientific_name && (
+                    <div style={{ color: "#0d9488", fontStyle: "italic", fontWeight: 600, fontSize: "0.95rem" }}>
+                      {selectedSpecies.scientific_name}
+                    </div>
+                  )}
+                </div>
                 <span className="modal-tag">{selectedSpecies.type}</span>
               </div>
 

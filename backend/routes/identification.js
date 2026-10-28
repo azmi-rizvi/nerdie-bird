@@ -119,11 +119,14 @@ router.post('/', (req, res, next) => {
 You are an expert avian biologist and bird identifier.
 Analyze the provided ${uploadedFile ? 'image' : ''}${uploadedFile && description ? ' and ' : ''}${description ? `description: "${description}"` : ''}.
 Identify the bird species based strictly on visible morphological features (plumage, beak shape, eye markings, crest, coloration, size).
-Provide factual care, natural habitat, and diet details.
+
+CRITICAL REQUIREMENT:
+The identified bird MUST be an actual, real, extant biological species recognized by scientific taxonomy (such as the IOC World Bird List). NEVER invent fictional or hybrid bird names.
 
 Respond with ONLY a valid JSON object matching this schema:
 {
-  "species_name": "Common species name (or 'Unknown Bird Species' if not a recognizable bird)",
+  "species_name": "Real common species name (or 'Unknown Bird Species' if not a recognizable bird)",
+  "scientific_name": "Valid Latin binomial name (e.g. 'Nymphicus hollandicus', 'Melopsittacus undulatus')",
   "confidence": "High, Medium, or Low",
   "description": "Comprehensive physical description and key visual identifying features that confirm this ID",
   "fun_facts": [

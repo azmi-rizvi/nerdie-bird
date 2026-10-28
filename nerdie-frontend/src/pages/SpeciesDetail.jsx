@@ -76,6 +76,11 @@ function SpeciesDetail() {
           <div className="species-header">
             <div>
               <h1>{species.name}</h1>
+              {species.scientific_name && (
+                <div style={{ color: "#0d9488", fontStyle: "italic", fontWeight: 600, fontSize: "1.05rem", marginTop: "2px" }}>
+                  {species.scientific_name}
+                </div>
+              )}
               <p style={{ margin: "6px 0 0", color: "var(--brown-soft)" }}>Species ID: #{species.id}</p>
             </div>
             <span className="species-type-pill">{species.type}</span>
