@@ -160,7 +160,7 @@ function initDatabase() {
       "Warm, extremely loving, and demonstrative. They bond deeply with caretakers and thrive with 2-3 hours of out-of-cage interaction daily.",
       "20 - 30 years",
       "Sun conures are famous for their sunset-colored golden plumage and piercing vocal contact calls that can carry over two miles in the wild!",
-      "https://images.unsplash.com/photo-1555169062-013468b47731?auto=format&fit=crop&w=800&q=80"
+      "/species/sun-conure.jpg"
     ],
     [
       "Eclectus Parrot",
@@ -171,7 +171,7 @@ function initDatabase() {
       "Gentle, calm, and contemplative companions that appreciate quiet environments, predictable routines, and positive encouragement.",
       "30 - 45 years",
       "Eclectus parrots exhibit extreme sexual dimorphism: males are brilliant emerald green while females are regal crimson and royal purple!",
-      "https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80"
+      "/species/eclectus-parrot.jpg"
     ],
     [
       "Victoria Crowned Pigeon",
@@ -182,7 +182,7 @@ function initDatabase() {
       "Peaceful flock birds that form lifelong monogamous pairs and communicate with deep, resonant booming calls.",
       "20 - 25 years",
       "Victoria Crowned Pigeons are the largest living pigeon species on Earth, reaching the size of a female turkey with lacy crown crests!",
-      "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80"
+      "/species/victoria-crowned-pigeon.jpg"
     ],
     [
       "Bald Eagle",
@@ -193,7 +193,7 @@ function initDatabase() {
       "Monogamous pairs with aerial cartwheel courtship displays and strong multi-square-mile territorial protection.",
       "20 - 30 years in wild, up to 40 in captivity",
       "Bald eagles build the largest tree nests of any bird species — record nests have measured 10 feet wide and weighed nearly 3 tons!",
-      "https://images.unsplash.com/photo-1618826411640-d6df44dd3f7a?auto=format&fit=crop&w=800&q=80"
+      "/species/bald-eagle.jpg"
     ],
     [
       "Snowy Owl",
@@ -204,7 +204,7 @@ function initDatabase() {
       "Solitary, nomadic hunter active during both day and night throughout the continuous Arctic summer daylight.",
       "10 - 15 years in wild, up to 28 in sanctuaries",
       "Unlike most nocturnal owls, snowy owls are diurnal and have thick plumage covering their talons to thrive in temperatures below -50°F.",
-      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=800&q=80"
+      "/species/snowy-owl.jpg"
     ],
     [
       "Common Kingfisher",
@@ -215,7 +215,7 @@ function initDatabase() {
       "Highly solitary and territorial along riverbank stretches; only associates with mates during active breeding.",
       "5 - 10 years in the wild",
       "Kingfishers dive into water at speeds over 25 mph with their eyes closed behind a third eyelid, catching fish entirely by precision instinct.",
-      "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80"
+      "/species/common-kingfisher.jpg"
     ],
     [
       "Sulphur-Crested Cockatoo",
@@ -226,7 +226,7 @@ function initDatabase() {
       "Extremely social and cognitively demanding. Needs 3-5 hours of interactive flight time, problem-solving puzzles, and vocal routines.",
       "60 - 80+ years",
       "Sulphur-crested cockatoos are almost 100% left-footed, and their dramatic yellow crest fans out like a radiant crown when startled or joyful.",
-      "https://images.unsplash.com/photo-1598387993441-a364f854c3e1?auto=format&fit=crop&w=800&q=80"
+      "/species/sulphur-crested-cockatoo.jpg"
     ],
     [
       "California Quail",
@@ -237,7 +237,7 @@ function initDatabase() {
       "Forms tightly knit coveys that forage together, posting designated sentinels on high fence posts to scan for predators.",
       "4 - 6 years",
       "The distinctive forward-drooping head plume (topknot) of the California quail is actually made up of six intricately overlapping feathers!",
-      "https://images.unsplash.com/photo-1606567595334-d39972c85dbe?auto=format&fit=crop&w=800&q=80"
+      "/species/california-quail.jpg"
     ],
     [
       "Red-Crowned Kakariki",
@@ -248,7 +248,7 @@ function initDatabase() {
       "Inquisitive, energetic ground foragers with charming goat-like 'meh-meh' vocalizations and friendly curiosity.",
       "10 - 15 years",
       "Kakarikis forage on the ground using their feet like chickens, kicking back leaf litter to uncover hidden seeds and subterranean insects!",
-      "https://images.unsplash.com/photo-1612024782955-49fae79e42bb?auto=format&fit=crop&w=800&q=80"
+      "/species/red-crowned-kakariki.jpg"
     ],
     [
       "Rainbow Lorikeet",
@@ -259,7 +259,7 @@ function initDatabase() {
       "Boisterous, high-energy acrobats that form devoted lifelong pairs and perform comical head-bobbing courtship hops.",
       "15 - 25 years",
       "Lorikeets have unique brush-tipped tongues covered in tiny papillae evolved specifically for harvesting liquid nectar and pollen from flowers.",
-      "https://images.unsplash.com/photo-1535083783855-76ae62b2914e?auto=format&fit=crop&w=800&q=80"
+      "/species/rainbow-lorikeet.jpg"
     ],
     [
       "European Goldfinch",
@@ -270,7 +270,7 @@ function initDatabase() {
       "Cheerful, social songbirds that gather in twittering winter flocks ('charms') and sing bright liquid melodies.",
       "8 - 12 years",
       "The slender bill of the European goldfinch is perfectly adapted to extract tiny seeds from within spiky, thorny thistle flowerheads.",
-      "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80"
+      "/species/european-goldfinch.jpg"
     ],
     [
       "Mourning Dove",
@@ -281,7 +281,7 @@ function initDatabase() {
       "Peaceful and serene companions renowned for their soothing, meditative low 'coo-oo-oo' calls and gentle disposition.",
       "7 - 12 years in wild, up to 18 in captivity",
       "Both male and female mourning doves secrete nutritious 'crop milk' from their throat linings to nurse their squabs during the first week.",
-      "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80"
+      "/species/mourning-dove.jpg"
     ],
     [
       "Red-Tailed Hawk",
@@ -292,7 +292,7 @@ function initDatabase() {
       "Solitary apex predator with keen eyesight that soars on thermals; pairs defend large multi-mile hunting territories.",
       "15 - 20 years in wild, up to 30 in sanctuaries",
       "The raspy, piercing scream of the Red-Tailed Hawk is so famous that Hollywood sound designers use it for nearly every movie eagle!",
-      "https://images.unsplash.com/photo-1568644396922-5c3bfae12521?auto=format&fit=crop&w=800&q=80"
+      "/species/red-tailed-hawk.jpg"
     ],
     [
       "Mallard Duck",
@@ -303,7 +303,7 @@ function initDatabase() {
       "Gregarious, social waterfowl with strong group dabbling routines and seasonal pairing rituals.",
       "5 - 10 years in wild, up to 20 in domestic care",
       "Almost all domestic duck breeds worldwide (with the exception of the Muscovy) are direct descendants of the wild Mallard!",
-      "https://images.unsplash.com/photo-1559827291-72ee739d0d9a?auto=format&fit=crop&w=800&q=80"
+      "/species/mallard-duck.jpg"
     ],
     [
       "Hyacinth Macaw",
@@ -314,7 +314,7 @@ function initDatabase() {
       "Gentle giants of the parrot world — deeply affectionate, intelligent, and requiring daily positive-reinforcement companionship.",
       "50 - 60+ years",
       "The Hyacinth Macaw is the longest flying parrot in the world (reaching 3.3 feet from head to tail) with brilliant cobalt plumage!",
-      "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=800&q=80"
+      "/species/hyacinth-macaw.jpg"
     ],
     [
       "Scarlet Macaw",
@@ -325,7 +325,7 @@ function initDatabase() {
       "Monogamous, highly vocal, and demonstrative flock bird that bonds deeply with chosen family members.",
       "40 - 50+ years",
       "Scarlet macaws regularly visit clay licks (riverbank cliffs) to ingest mineral-rich clay that neutralizes toxins found in raw rainforest seeds!",
-      "https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=800&q=80"
+      "/species/scarlet-macaw.jpg"
     ],
     [
       "Mandarin Duck",
@@ -336,7 +336,7 @@ function initDatabase() {
       "Shyer than common ducks; they pair closely and symbolize lifelong love and fidelity in East Asian art and folklore.",
       "6 - 10 years in wild, up to 15 in managed care",
       "Unlike most ducks that nest on the ground, Mandarin ducks nest high in tree cavities — ducklings jump from heights of 30+ feet right after hatching!",
-      "https://images.unsplash.com/photo-1563281577-a7be47e20db9?auto=format&fit=crop&w=800&q=80"
+      "/species/mandarin-duck.jpg"
     ],
     [
       "Hummingbird",
@@ -347,7 +347,7 @@ function initDatabase() {
       "Solitary, fiercely territorial defenders of flowering shrubs and feeders.",
       "3 - 5 years",
       "Hummingbirds are the only birds that can fly backwards and upside down, with wings beating up to 80 times per second and hearts beating over 1,200 bpm!",
-      "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?auto=format&fit=crop&w=800&q=80"
+      "/species/hummingbird.jpg"
     ],
     [
       "Keel-Billed Toucan",
@@ -358,7 +358,7 @@ function initDatabase() {
       "Playful and social flock bird that roosts in groups within tree cavities, tucking their massive bills beneath their wings.",
       "15 - 20 years",
       "The rainbow-colored bill of the toucan is hollow, reinforced by a honeycomb of keratin, making it surprisingly light and acting as a thermal radiator.",
-      "https://images.unsplash.com/photo-1589656966895-2f33e7653819?auto=format&fit=crop&w=800&q=80"
+      "/species/keel-billed-toucan.jpg"
     ],
     [
       "Diamond Dove",
@@ -369,7 +369,7 @@ function initDatabase() {
       "Calm, gentle, and quiet; thrives when kept in bonded pairs with a soft melodic 'coo-coo' vocalization.",
       "10 - 14 years",
       "Diamond doves are among the smallest doves in the world (measuring just 7 inches) and have striking bright orange-red rings around their eyes.",
-      "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=800&q=80"
+      "/species/diamond-dove.jpg"
     ],
     [
       "Gouldian Finch",
@@ -380,7 +380,7 @@ function initDatabase() {
       "Peaceful aviary flock finch that must be kept with other peaceful finches; dislikes handling but brings immense visual delight.",
       "6 - 8 years",
       "Known as the 'Rainbow Finch', wild Gouldian finches naturally occur in three distinct head-color morphs: black-headed, red-headed, and yellow-headed!",
-      "https://images.unsplash.com/photo-1549608276-5786777e6587?auto=format&fit=crop&w=800&q=80"
+      "/species/gouldian-finch.jpg"
     ],
     [
       "Peregrine Falcon",
@@ -391,7 +391,7 @@ function initDatabase() {
       "Solitary hunter outside the breeding season; pairs return to the same cliff ledge (eyrie) year after year.",
       "12 - 15 years in wild, up to 25 in sanctuaries",
       "The Peregrine Falcon is the fastest animal in the entire animal kingdom, reaching diving stoop speeds in excess of 240 mph (386 km/h)!",
-      "https://images.unsplash.com/photo-1611689342806-0863700ce1e4?auto=format&fit=crop&w=800&q=80"
+      "/species/peregrine-falcon.jpg"
     ],
     [
       "Bali Myna",
@@ -402,7 +402,7 @@ function initDatabase() {
       "Critically endangered species; very social with complex whistling calls, crest-raising displays, and head-bowing rituals.",
       "10 - 15 years",
       "The Bali Myna is snow-white with striking blue bare skin around the eyes and a jaunty head crest that can be raised and lowered!",
-      "https://images.unsplash.com/photo-1516600164266-f3b8166ae679?auto=format&fit=crop&w=800&q=80"
+      "/species/bali-myna.jpg"
     ],
     [
       "Java Sparrow",
@@ -413,7 +413,7 @@ function initDatabase() {
       "Gregarious, tidy, and peaceful flock bird that forms close bonds with partners, accompanied by bell-like chirping songs.",
       "7 - 10 years",
       "Despite their name, Java Sparrows are estrildid finches, recognized by their plump pink beaks and powdery grey and white plumage.",
-      "https://images.unsplash.com/photo-1480044965905-02098d419e96?auto=format&fit=crop&w=800&q=80"
+      "/species/java-sparrow.jpg"
     ],
     [
       "Wood Duck",
@@ -424,7 +424,7 @@ function initDatabase() {
       "Forms seasonal pairs with intricate head-pumping courtship displays and soft peeping calls.",
       "5 - 10 years in wild, up to 15 in domestic care",
       "Wood ducks have strong claws on their webbed feet that allow them to perch comfortably on high tree branches — a rarity among ducks!",
-      "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80"
+      "/species/wood-duck.jpg"
     ],
     [
       "Indian Peafowl",
@@ -435,7 +435,7 @@ function initDatabase() {
       "Harem social structure where a single flamboyant peacock commands a flock of peahens with booming 'may-awe' calls.",
       "15 - 20 years",
       "The famous peacock 'tail' is actually an elaborate train of upper tail coverts adorned with iridescent 'ocelli' (eye spots) that shimmer through structural coloration!",
-      "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&w=800&q=80"
+      "/species/indian-peafowl.jpg"
     ]
   ];
 
@@ -463,7 +463,35 @@ function initDatabase() {
     'Zebra Finch': '/species/zebra-finch.png',
     'Green-Cheeked Conure': '/species/green-cheeked-conure.jpg',
     'Barn Owl': '/species/barn-owl.jpg',
-    'Blue Jay': '/species/blue-jay.jpg'
+    'Blue Jay': '/species/blue-jay.jpg',
+    'Sun Conure': '/species/sun-conure.jpg',
+    'Eclectus Parrot': '/species/eclectus-parrot.jpg',
+    'Victoria Crowned Pigeon': '/species/victoria-crowned-pigeon.jpg',
+    'Bald Eagle': '/species/bald-eagle.jpg',
+    'Snowy Owl': '/species/snowy-owl.jpg',
+    'Common Kingfisher': '/species/common-kingfisher.jpg',
+    'Sulphur-Crested Cockatoo': '/species/sulphur-crested-cockatoo.jpg',
+    'California Quail': '/species/california-quail.jpg',
+    'Red-Crowned Kakariki': '/species/red-crowned-kakariki.jpg',
+    'Rainbow Lorikeet': '/species/rainbow-lorikeet.jpg',
+    'European Goldfinch': '/species/european-goldfinch.jpg',
+    'Mourning Dove': '/species/mourning-dove.jpg',
+    'Red-Tailed Hawk': '/species/red-tailed-hawk.jpg',
+    'Mallard Duck': '/species/mallard-duck.jpg',
+    'Hyacinth Macaw': '/species/hyacinth-macaw.jpg',
+    'Scarlet Macaw': '/species/scarlet-macaw.jpg',
+    'Mandarin Duck': '/species/mandarin-duck.jpg',
+    'Hummingbird': '/species/hummingbird.jpg',
+    'Keel-Billed Toucan': '/species/keel-billed-toucan.jpg',
+    'Diamond Dove': '/species/diamond-dove.jpg',
+    'Gouldian Finch': '/species/gouldian-finch.jpg',
+    'Peregrine Falcon': '/species/peregrine-falcon.jpg',
+    'Bali Myna': '/species/bali-myna.jpg',
+    'Java Sparrow': '/species/java-sparrow.jpg',
+    'Wood Duck': '/species/wood-duck.jpg',
+    'Indian Peafowl': '/species/indian-peafowl.jpg',
+    'Resplendent Quetzal': '/species/resplendent-quetzal.jpg',
+    'Superb Lyrebird': '/species/superb-lyrebird.jpg'
   };
 
   const updateSpeciesImage = db.prepare('UPDATE species SET image_url = ? WHERE name = ?');

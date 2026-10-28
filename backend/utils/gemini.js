@@ -19,18 +19,18 @@ if (!apiKey) {
 
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
-// High-speed Flash models with verified fast response times
+// High-speed Flash models prioritizing available active models (gemini-flash-lite-latest and gemini-3.8-flash)
 const CANDIDATE_MODELS = [
-  'gemini-2.5-flash',
   'gemini-flash-lite-latest',
+  'gemini-3.8-flash',
   'gemini-3.1-flash-lite',
-  'gemini-3.8-flash'
+  'gemini-2.5-flash'
 ];
 
 /**
  * Timeout wrapper for async promises
  */
-function withTimeout(promise, ms = 20000) {
+function withTimeout(promise, ms = 25000) {
   let timer;
   const timeoutPromise = new Promise((_, reject) => {
     timer = setTimeout(() => {
@@ -118,7 +118,7 @@ function extractJSON(text) {
 /**
  * Generate AI content with automatic model fallback
  */
-async function generateAIContent({ contents, responseMimeType = 'application/json', responseSchema, systemInstruction, timeoutMs = 20000 }) {
+async function generateAIContent({ contents, responseMimeType = 'application/json', responseSchema, systemInstruction, timeoutMs = 25000 }) {
   if (!ai || !apiKey) {
     const error = new GeminiServiceError(
       'AI_NOT_CONFIGURED',

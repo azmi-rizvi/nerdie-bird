@@ -14,17 +14,17 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Fallback high-resolution Unsplash images by species category
+// Guaranteed authentic local bird photos by category
 const CATEGORY_FALLBACK_IMAGES = {
-  'Parrots': 'https://images.unsplash.com/photo-1555169062-013468b47731?auto=format&fit=crop&w=800&q=80',
-  'Finches': 'https://images.unsplash.com/photo-1549608276-5786777e6587?auto=format&fit=crop&w=800&q=80',
-  'Canaries': 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',
-  'Raptors': 'https://images.unsplash.com/photo-1611689342806-0863700ce1e4?auto=format&fit=crop&w=800&q=80',
-  'Wild Birds': 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-  'Waterfowl': 'https://images.unsplash.com/photo-1563281577-a7be47e20db9?auto=format&fit=crop&w=800&q=80',
-  'Softbills': 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?auto=format&fit=crop&w=800&q=80',
-  'Pigeons & Doves': 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80',
-  'Default': 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80'
+  'Parrots': '/species/cockatiel.jpg',
+  'Finches': '/species/zebra-finch.png',
+  'Canaries': '/species/canary.jpg',
+  'Raptors': '/species/barn-owl.jpg',
+  'Wild Birds': '/species/blue-jay.jpg',
+  'Waterfowl': '/species/mandarin-duck.jpg',
+  'Softbills': '/species/keel-billed-toucan.jpg',
+  'Pigeons & Doves': '/species/victoria-crowned-pigeon.jpg',
+  'Default': '/species/cockatiel.jpg'
 };
 
 const upload = multer({
@@ -132,7 +132,7 @@ Respond with ONLY a valid JSON object matching this schema:
   ],
   "habitat": "Natural geographic origin and wild habitat",
   "diet": "Recommended domestic diet (pellets, seeds, greens) or natural wild diet",
-  "image_url": "A high-quality Unsplash image URL matching the identified species (e.g. https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80)"
+  "image_url": "Direct, authentic public photo URL of this exact bird species to show to the user (e.g. from Wikimedia Commons or Wikipedia). Return ONLY a direct photo link of this bird species, never random scenery, drones, or people."
 }`;
 
   contents.push(promptText);
@@ -177,14 +177,13 @@ Respond with ONLY a valid JSON object matching this schema:
       };
       modelUsed = 'database-fallback';
     } else {
-      // If no fallback match could be found, return the structured Gemini error
       return sendGeminiError(res, error);
     }
   }
 
   const speciesName = (aiResult.species_name || 'Unknown Bird').trim();
 
-  // Check if species exists in local database to attach species_id & fallback photo
+  // Check if species exists in local database to attach species_id & authentic local photo
   const dbSpecies = db.prepare(`
     SELECT * FROM species
     WHERE LOWER(name) = LOWER(?) OR LOWER(name) LIKE LOWER(?)
@@ -195,7 +194,7 @@ Respond with ONLY a valid JSON object matching this schema:
     ? aiResult.fun_facts
     : [aiResult.fun_facts].filter(Boolean);
 
-  // Guarantee that image_url is ALWAYS populated with a working image
+  // Guarantee that image_url is ALWAYS populated with an authentic bird image
   let finalImageUrl = uploadedImageUrl;
   if (!finalImageUrl && dbSpecies?.image_url) {
     finalImageUrl = dbSpecies.image_url;

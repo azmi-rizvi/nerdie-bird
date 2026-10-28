@@ -1,20 +1,92 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const path = require('path');
 const db = require('../database');
 const { generateAIContent, sendGeminiError } = require('../utils/gemini');
 
-// Curated high-resolution fallback Unsplash images by bird category
-const TYPE_FALLBACK_IMAGES = {
-  'Parrots': 'https://images.unsplash.com/photo-1555169062-013468b47731?auto=format&fit=crop&w=800&q=80',
-  'Finches': 'https://images.unsplash.com/photo-1549608276-5786777e6587?auto=format&fit=crop&w=800&q=80',
-  'Canaries': 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',
-  'Raptors': 'https://images.unsplash.com/photo-1611689342806-0863700ce1e4?auto=format&fit=crop&w=800&q=80',
-  'Wild Birds': 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80',
-  'Waterfowl': 'https://images.unsplash.com/photo-1563281577-a7be47e20db9?auto=format&fit=crop&w=800&q=80',
-  'Softbills': 'https://images.unsplash.com/photo-1589656966895-2f33e7653819?auto=format&fit=crop&w=800&q=80',
-  'Pigeons & Doves': 'https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=800&q=80',
-  'Default': 'https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80'
+const publicSpeciesDir = path.join(__dirname, '..', '..', 'nerdie-frontend', 'public', 'species');
+const backendSpeciesDir = path.join(__dirname, '..', 'uploads', 'species');
+
+if (!fs.existsSync(publicSpeciesDir)) fs.mkdirSync(publicSpeciesDir, { recursive: true });
+if (!fs.existsSync(backendSpeciesDir)) fs.mkdirSync(backendSpeciesDir, { recursive: true });
+
+// Curated verified local fallback bird images by category
+const TYPE_LOCAL_FALLBACK = {
+  'Parrots': '/species/cockatiel.jpg',
+  'Finches': '/species/zebra-finch.png',
+  'Canaries': '/species/canary.jpg',
+  'Raptors': '/species/barn-owl.jpg',
+  'Wild Birds': '/species/blue-jay.jpg',
+  'Waterfowl': '/species/mandarin-duck.jpg',
+  'Softbills': '/species/keel-billed-toucan.jpg',
+  'Pigeons & Doves': '/species/victoria-crowned-pigeon.jpg',
+  'Default': '/species/cockatiel.jpg'
 };
+
+/**
+ * Automatically downloads and caches an authentic canonical photograph of the discovered bird species
+ */
+async function fetchAndSaveBirdPhoto(speciesName, geminiImageUrl, categoryType) {
+  try {
+    const slug = speciesName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const filename = `${slug}.jpg`;
+    const pubDest = path.join(publicSpeciesDir, filename);
+    const bkdDest = path.join(backendSpeciesDir, filename);
+
+    // If file already exists locally, use it immediately
+    if (fs.existsSync(pubDest) && fs.statSync(pubDest).size > 5000) {
+      if (!fs.existsSync(bkdDest)) fs.copyFileSync(pubDest, bkdDest);
+      return `/species/${filename}`;
+    }
+
+    // 1. First priority: Fetch authentic canonical photograph from Wikipedia pageimages API
+    const endpoint = new URL('https://en.wikipedia.org/w/api.php');
+    endpoint.searchParams.set('action', 'query');
+    endpoint.searchParams.set('titles', speciesName);
+    endpoint.searchParams.set('prop', 'pageimages');
+    endpoint.searchParams.set('format', 'json');
+    endpoint.searchParams.set('pithumbsize', '900');
+
+    let downloadUrl = null;
+    try {
+      const res = await fetch(endpoint.toString(), {
+        headers: { 'User-Agent': 'FeatherCareBot/1.0 (contact@feathercare.local)' }
+      });
+      const data = await res.json();
+      const page = Object.values(data.query?.pages || {})[0];
+      downloadUrl = page?.thumbnail?.source || null;
+    } catch (wikiErr) {
+      console.warn(`Wiki photo lookup for "${speciesName}":`, wikiErr.message);
+    }
+
+    // 2. Second priority: If Gemini provided a direct http image URL
+    if (!downloadUrl && geminiImageUrl && typeof geminiImageUrl === 'string' && geminiImageUrl.startsWith('http')) {
+      downloadUrl = geminiImageUrl;
+    }
+
+    // 3. Download and save locally
+    if (downloadUrl) {
+      const imgRes = await fetch(downloadUrl, {
+        headers: { 'User-Agent': 'FeatherCareBot/1.0 (contact@feathercare.local)' }
+      });
+      if (imgRes.ok) {
+        const buffer = Buffer.from(await imgRes.arrayBuffer());
+        if (buffer.length > 5000) {
+          fs.writeFileSync(pubDest, buffer);
+          fs.writeFileSync(bkdDest, buffer);
+          console.log(`[Auto-Cached Photo] Downloaded verified photo for "${speciesName}" -> /species/${filename}`);
+          return `/species/${filename}`;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn(`Could not save local photo for "${speciesName}":`, err.message);
+  }
+
+  // Safe fallback to guaranteed authentic local bird photo
+  return TYPE_LOCAL_FALLBACK[categoryType] || TYPE_LOCAL_FALLBACK['Default'];
+}
 
 // GET /api/species/types - return list of all distinct species types
 router.get('/types', (req, res) => {
@@ -43,7 +115,7 @@ CRITICAL EXCLUSIONS:
 Do NOT choose any of the following species (they are already in our database):
 ${existingNames.slice(0, 50).join(', ')}
 
-Pick an intriguing, authentic, and distinctive real bird species (e.g., from Parrots, Finches, Raptors, Softbills, Waterfowl, Wild Birds, Canaries, or Pigeons & Doves).
+Pick an authentic, recognized real bird species (e.g., from Parrots, Finches, Raptors, Softbills, Waterfowl, Wild Birds, Canaries, or Pigeons & Doves).
 Provide accurate, comprehensive care and biological details.
 
 Respond with ONLY a valid JSON object matching this exact schema:
@@ -59,7 +131,7 @@ Respond with ONLY a valid JSON object matching this exact schema:
     "Fascinating behavioral or physiological fact 1",
     "Fascinating behavioral or physiological fact 2"
   ],
-  "image_url": "A high-quality, valid Unsplash image URL matching this species (e.g., https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=800&q=80)"
+  "image_url": "Direct, authentic public photo URL of this exact bird species to show to the user (e.g. from Wikimedia Commons or Wikipedia). Return ONLY a direct photo link of this bird species, never random scenery, drones, or people."
 }
 `;
 
@@ -80,16 +152,13 @@ Respond with ONLY a valid JSON object matching this exact schema:
     // Check if name already exists in database
     const existingCheck = db.prepare('SELECT * FROM species WHERE LOWER(name) = LOWER(?)').get(speciesName);
     if (existingCheck) {
-      // Return existing record if already found
       return res.json(existingCheck);
     }
 
-    // Resolve image URL
-    let imageUrl = birdData.image_url;
-    if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.startsWith('http')) {
-      const birdType = birdData.type || 'Default';
-      imageUrl = TYPE_FALLBACK_IMAGES[birdType] || TYPE_FALLBACK_IMAGES['Default'];
-    }
+    const categoryType = String(birdData.type || 'Companion Bird').trim();
+
+    // Fetch and cache the authentic canonical bird photo
+    const localImageUrl = await fetchAndSaveBirdPhoto(speciesName, birdData.image_url, categoryType);
 
     // Format fun_facts string for database
     let funFactsStr = '';
@@ -101,7 +170,6 @@ Respond with ONLY a valid JSON object matching this exact schema:
       funFactsStr = 'Intriguing and beautiful bird species.';
     }
 
-    const categoryType = String(birdData.type || 'Companion Bird').trim();
     const habitat = String(birdData.habitat || 'Varied natural habitats').trim();
     const diet = String(birdData.diet || 'Nutritious balanced diet').trim();
     const cageSetup = String(birdData.cage_setup || 'Spacious enclosure with safe natural perches').trim();
@@ -123,7 +191,7 @@ Respond with ONLY a valid JSON object matching this exact schema:
       socialNeeds,
       lifespan,
       funFactsStr,
-      imageUrl
+      localImageUrl
     );
 
     // 4. Retrieve and return newly saved record with assigned id

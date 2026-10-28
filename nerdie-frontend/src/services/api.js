@@ -8,7 +8,7 @@ const BACKEND_HOST = import.meta.env.VITE_API_URL || 'http://localhost:5001';
 const API_BASE = `${BACKEND_HOST}/api`;
 
 /**
- * Mapping of bird species names to local images in frontend public/species folder
+ * Mapping of bird species names to verified local canonical images in public/species folder
  */
 export const SPECIES_IMAGE_MAP = {
   'cockatiel': '/species/cockatiel.jpg',
@@ -18,11 +18,57 @@ export const SPECIES_IMAGE_MAP = {
   'african grey parrot': '/species/african-grey.jpg',
   'lovebird': '/species/lovebird.jpg',
   'canary': '/species/canary.jpg',
+  'atlantic canary': '/species/canary.jpg',
   'zebra finch': '/species/zebra-finch.png',
   'green-cheeked conure': '/species/green-cheeked-conure.jpg',
   'green cheeked conure': '/species/green-cheeked-conure.jpg',
   'barn owl': '/species/barn-owl.jpg',
   'blue jay': '/species/blue-jay.jpg',
+  'sun conure': '/species/sun-conure.jpg',
+  'eclectus parrot': '/species/eclectus-parrot.jpg',
+  'eclectus': '/species/eclectus-parrot.jpg',
+  'victoria crowned pigeon': '/species/victoria-crowned-pigeon.jpg',
+  'bald eagle': '/species/bald-eagle.jpg',
+  'snowy owl': '/species/snowy-owl.jpg',
+  'common kingfisher': '/species/common-kingfisher.jpg',
+  'kingfisher': '/species/common-kingfisher.jpg',
+  'sulphur-crested cockatoo': '/species/sulphur-crested-cockatoo.jpg',
+  'sulphur crested cockatoo': '/species/sulphur-crested-cockatoo.jpg',
+  'california quail': '/species/california-quail.jpg',
+  'quail': '/species/california-quail.jpg',
+  'red-crowned kakariki': '/species/red-crowned-kakariki.jpg',
+  'kakariki': '/species/red-crowned-kakariki.jpg',
+  'rainbow lorikeet': '/species/rainbow-lorikeet.jpg',
+  'lorikeet': '/species/rainbow-lorikeet.jpg',
+  'european goldfinch': '/species/european-goldfinch.jpg',
+  'goldfinch': '/species/european-goldfinch.jpg',
+  'mourning dove': '/species/mourning-dove.jpg',
+  'red-tailed hawk': '/species/red-tailed-hawk.jpg',
+  'hawk': '/species/red-tailed-hawk.jpg',
+  'mallard duck': '/species/mallard-duck.jpg',
+  'mallard': '/species/mallard-duck.jpg',
+  'hyacinth macaw': '/species/hyacinth-macaw.jpg',
+  'scarlet macaw': '/species/scarlet-macaw.jpg',
+  'macaw': '/species/scarlet-macaw.jpg',
+  'mandarin duck': '/species/mandarin-duck.jpg',
+  'hummingbird': '/species/hummingbird.jpg',
+  "anna's hummingbird": '/species/hummingbird.jpg',
+  'keel-billed toucan': '/species/keel-billed-toucan.jpg',
+  'toucan': '/species/keel-billed-toucan.jpg',
+  'diamond dove': '/species/diamond-dove.jpg',
+  'gouldian finch': '/species/gouldian-finch.jpg',
+  'peregrine falcon': '/species/peregrine-falcon.jpg',
+  'falcon': '/species/peregrine-falcon.jpg',
+  'bali myna': '/species/bali-myna.jpg',
+  'java sparrow': '/species/java-sparrow.jpg',
+  'wood duck': '/species/wood-duck.jpg',
+  'indian peafowl': '/species/indian-peafowl.jpg',
+  'peacock': '/species/indian-peafowl.jpg',
+  'peafowl': '/species/indian-peafowl.jpg',
+  'resplendent quetzal': '/species/resplendent-quetzal.jpg',
+  'quetzal': '/species/resplendent-quetzal.jpg',
+  'superb lyrebird': '/species/superb-lyrebird.jpg',
+  'lyrebird': '/species/superb-lyrebird.jpg'
 };
 
 /**
@@ -49,7 +95,7 @@ export function getSpeciesImageUrl(speciesName, path) {
       return SPECIES_IMAGE_MAP[key];
     }
     for (const [sKey, sUrl] of Object.entries(SPECIES_IMAGE_MAP)) {
-      if (key.includes(sKey) || sKey.includes(key)) {
+      if (key === sKey || key.includes(sKey) || sKey.includes(key)) {
         return sUrl;
       }
     }
@@ -236,5 +282,7 @@ export default {
   createMyBird,
   updateMyBird,
   deleteMyBird,
-  getImageUrl
+  getImageUrl,
+  getSpeciesImageUrl,
+  SPECIES_IMAGE_MAP
 };
