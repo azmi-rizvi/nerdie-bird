@@ -216,15 +216,17 @@ function MyBirds() {
                   <div className="user-bird-img-frame">
                     <div
                       className="user-bird-img-backdrop"
-                      style={{ backgroundImage: `url(${displayImage})` }}
+                      style={{ backgroundImage: `url("${displayImage}")` }}
                     />
                     <img
                       src={displayImage}
                       alt={bird.name}
                       className="user-bird-img"
+                      referrerPolicy="no-referrer"
+                      crossOrigin="anonymous"
                       onError={(e) => {
                         const fallback = getSpeciesImageUrl(bird.species_name);
-                        if (fallback && !e.target.src.endsWith(fallback)) {
+                        if (fallback && e.target.src !== fallback && !e.target.src.endsWith(fallback)) {
                           e.target.src = fallback;
                         } else {
                           e.target.onerror = null;

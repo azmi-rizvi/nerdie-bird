@@ -77,24 +77,36 @@ export const SPECIES_IMAGE_MAP = {
 export function getSpeciesImageUrl(speciesName, path) {
   if (typeof path === 'string' && path.trim()) {
     const trimmedPath = path.trim();
+    // 1. Direct web URLs (Gemini / Wikimedia Commons / Unsplash)
     if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
       return trimmedPath;
     }
-    if (trimmedPath.startsWith('/species/')) {
-      return trimmedPath;
+    // 2. Uploads folder
+    if (trimmedPath.startsWith('/uploads')) {
+      return `${BACKEND_HOST}${trimmedPath}`;
     }
-    if (trimmedPath.startsWith('/uploads/species/')) {
-      return trimmedPath.replace('/uploads/species/', '/species/');
+    // 3. Species folder
+    if (trimmedPath.startsWith('/species/')) {
+      const filename = trimmedPath.replace('/species/', '').toLowerCase();
+      const isBundled = Object.values(SPECIES_IMAGE_MAP).some(p => p.toLowerCase().endsWith(filename));
+      if (isBundled) {
+        return trimmedPath;
+      }
+      if (BACKEND_HOST && !BACKEND_HOST.includes('localhost:5001')) {
+        return `${BACKEND_HOST}${trimmedPath}`;
+      }
+      return trimmedPath;
     }
     if (trimmedPath.includes('/species/')) {
       const filename = trimmedPath.split('/').pop();
+      if (BACKEND_HOST && !BACKEND_HOST.includes('localhost:5001')) {
+        return `${BACKEND_HOST}/species/${filename}`;
+      }
       return `/species/${filename}`;
-    }
-    if (trimmedPath.startsWith('/uploads')) {
-      return getImageUrl(trimmedPath);
     }
   }
 
+  // 4. Bundled fallback images by species name
   if (speciesName && typeof speciesName === 'string') {
     const key = speciesName.trim().toLowerCase();
     if (SPECIES_IMAGE_MAP[key]) {
@@ -110,24 +122,18 @@ export function getSpeciesImageUrl(speciesName, path) {
   return getImageUrl(path);
 }
 
-/**
- * Helper to resolve static image URLs from the backend
- */
 export function getImageUrl(path) {
   if (!path) return '';
-  if (path.startsWith('/species/')) {
-    return path;
+  const trimmed = path.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
   }
-  if (path.startsWith('/uploads/species/')) {
-    return path.replace('/uploads/species/', '/species/');
+  if (trimmed.startsWith('/uploads') || trimmed.startsWith('/species/')) {
+    if (BACKEND_HOST && !BACKEND_HOST.includes('localhost:5001')) {
+      return `${BACKEND_HOST}${trimmed}`;
+    }
   }
-  if (path.startsWith('http://') || path.startsWith('https://')) {
-    return path;
-  }
-  if (path.startsWith('/uploads')) {
-    return `${BACKEND_HOST}${path}`;
-  }
-  return path;
+  return trimmed;
 }
 
 /**

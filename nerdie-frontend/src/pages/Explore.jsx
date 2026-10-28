@@ -175,15 +175,18 @@ function Explore() {
                   <>
                     <div
                       className="bird-backdrop"
-                      style={{ backgroundImage: `url(${getSpeciesImageUrl(b.name, b.image_url)})` }}
+                      style={{ backgroundImage: `url("${getSpeciesImageUrl(b.name, b.image_url)}")` }}
                     />
                     <img
                       src={getSpeciesImageUrl(b.name, b.image_url)}
                       alt={b.name}
                       className="bird-img"
+                      referrerPolicy="no-referrer"
+                      crossOrigin="anonymous"
+                      loading="lazy"
                       onError={(e) => {
                         const fallback = getSpeciesImageUrl(b.name);
-                        if (fallback && !e.target.src.endsWith(fallback)) {
+                        if (fallback && e.target.src !== fallback && !e.target.src.endsWith(fallback)) {
                           e.target.src = fallback;
                         } else {
                           e.target.style.display = 'none';
@@ -264,16 +267,19 @@ function Explore() {
                   <div className="modal-header-frame">
                     <div
                       className="modal-header-backdrop"
-                      style={{ backgroundImage: `url(${getSpeciesImageUrl(discoveredBird.name, discoveredBird.image_url)})` }}
+                      style={{ backgroundImage: `url("${getSpeciesImageUrl(discoveredBird.name, discoveredBird.image_url)}")` }}
                     />
                     <img
                       src={getSpeciesImageUrl(discoveredBird.name, discoveredBird.image_url)}
                       alt={discoveredBird.name}
                       className="modal-header-img"
+                      referrerPolicy="no-referrer"
+                      crossOrigin="anonymous"
+                      loading="eager"
                       onError={(e) => {
-                        const fallback = getSpeciesImageUrl(discoveredBird.name);
-                        if (fallback && !e.target.src.endsWith(fallback)) {
-                          e.target.src = fallback;
+                        const candidate = discoveredBird.web_image_url || getSpeciesImageUrl(discoveredBird.name);
+                        if (candidate && e.target.src !== candidate && !e.target.src.endsWith(candidate)) {
+                          e.target.src = candidate;
                         }
                       }}
                     />
@@ -359,15 +365,18 @@ function Explore() {
               <div className="modal-header-frame">
                 <div
                   className="modal-header-backdrop"
-                  style={{ backgroundImage: `url(${getSpeciesImageUrl(selectedSpecies.name, selectedSpecies.image_url)})` }}
+                  style={{ backgroundImage: `url("${getSpeciesImageUrl(selectedSpecies.name, selectedSpecies.image_url)}")` }}
                 />
                 <img
                   src={getSpeciesImageUrl(selectedSpecies.name, selectedSpecies.image_url)}
                   alt={selectedSpecies.name}
                   className="modal-header-img"
+                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
+                  loading="eager"
                   onError={(e) => {
                     const fallback = getSpeciesImageUrl(selectedSpecies.name);
-                    if (fallback && !e.target.src.endsWith(fallback)) {
+                    if (fallback && e.target.src !== fallback && !e.target.src.endsWith(fallback)) {
                       e.target.src = fallback;
                     }
                   }}

@@ -53,9 +53,11 @@ if (!fs.existsSync(backendSpeciesDir)) {
   fs.mkdirSync(backendSpeciesDir, { recursive: true });
 }
 
+app.use('/species', express.static(backendSpeciesDir));
+app.use('/uploads/species', express.static(backendSpeciesDir));
+
 if (fs.existsSync(frontendSpeciesDir)) {
   app.use('/species', express.static(frontendSpeciesDir));
-  app.use('/uploads/species', express.static(frontendSpeciesDir));
 
   try {
     const files = fs.readdirSync(frontendSpeciesDir);

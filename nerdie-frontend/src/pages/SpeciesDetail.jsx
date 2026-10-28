@@ -56,15 +56,17 @@ function SpeciesDetail() {
           <div className="species-hero-frame">
             <div
               className="species-hero-backdrop"
-              style={{ backgroundImage: `url(${getSpeciesImageUrl(species.name, species.image_url)})` }}
+              style={{ backgroundImage: `url("${getSpeciesImageUrl(species.name, species.image_url)}")` }}
             />
             <img
               src={getSpeciesImageUrl(species.name, species.image_url)}
               alt={species.name}
               className="species-hero-img"
+              referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
               onError={(e) => {
                 const fallback = getSpeciesImageUrl(species.name);
-                if (fallback && !e.target.src.endsWith(fallback)) {
+                if (fallback && e.target.src !== fallback && !e.target.src.endsWith(fallback)) {
                   e.target.src = fallback;
                 }
               }}

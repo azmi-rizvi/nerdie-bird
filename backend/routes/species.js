@@ -178,8 +178,11 @@ async function fetchAndSaveBirdPhoto(speciesName, wikiThumbnail, geminiImageUrl,
     const bkdDest = path.join(backendSpeciesDir, filename);
 
     // If file already exists locally, use it immediately
+    if (fs.existsSync(bkdDest) && fs.statSync(bkdDest).size > 5000) {
+      return `/species/${filename}`;
+    }
     if (fs.existsSync(pubDest) && fs.statSync(pubDest).size > 5000) {
-      if (!fs.existsSync(bkdDest)) fs.copyFileSync(pubDest, bkdDest);
+      try { if (!fs.existsSync(bkdDest)) fs.copyFileSync(pubDest, bkdDest); } catch(e){}
       return `/species/${filename}`;
     }
 
@@ -198,7 +201,10 @@ async function fetchAndSaveBirdPhoto(speciesName, wikiThumbnail, geminiImageUrl,
       if (imgRes.ok) {
         const buffer = Buffer.from(await imgRes.arrayBuffer());
         if (buffer.length > 5000) {
-          fs.writeFileSync(pubDest, buffer);
+          if (fs.existsSync(publicSpeciesDir)) {
+            try { fs.writeFileSync(pubDest, buffer); } catch(e){}
+          }
+          if (!fs.existsSync(backendSpeciesDir)) fs.mkdirSync(backendSpeciesDir, { recursive: true });
           fs.writeFileSync(bkdDest, buffer);
           console.log(`[Auto-Cached Photo] Downloaded verified photo for "${speciesName}" -> /species/${filename}`);
           return `/species/${filename}`;
@@ -364,6 +370,7 @@ Respond with ONLY a valid JSON object matching this exact schema:
 
     return res.status(201).json({
       ...newRecord,
+      web_image_url: wikiResult.thumbnail || birdData.image_url || null,
       fun_facts_array: Array.isArray(birdData.fun_facts) ? birdData.fun_facts : [funFactsStr],
       ai_discovered: true,
       ai_model: aiResponse.modelUsed

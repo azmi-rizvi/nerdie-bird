@@ -77,8 +77,11 @@ async function fetchAndCacheBirdPhoto(speciesName, scientificName, geminiImageUr
     const bkdDest = path.join(backendSpeciesDir, filename);
 
     // If file already exists locally, use it immediately
+    if (fs.existsSync(bkdDest) && fs.statSync(bkdDest).size > 5000) {
+      return `/species/${filename}`;
+    }
     if (fs.existsSync(pubDest) && fs.statSync(pubDest).size > 5000) {
-      if (!fs.existsSync(bkdDest)) fs.copyFileSync(pubDest, bkdDest);
+      try { if (!fs.existsSync(bkdDest)) fs.copyFileSync(pubDest, bkdDest); } catch(e){}
       return `/species/${filename}`;
     }
 
@@ -118,7 +121,10 @@ async function fetchAndCacheBirdPhoto(speciesName, scientificName, geminiImageUr
       if (imgRes.ok) {
         const buffer = Buffer.from(await imgRes.arrayBuffer());
         if (buffer.length > 5000) {
-          fs.writeFileSync(pubDest, buffer);
+          if (fs.existsSync(publicSpeciesDir)) {
+            try { fs.writeFileSync(pubDest, buffer); } catch(e){}
+          }
+          if (!fs.existsSync(backendSpeciesDir)) fs.mkdirSync(backendSpeciesDir, { recursive: true });
           fs.writeFileSync(bkdDest, buffer);
           console.log(`[Auto-Cached Photo] Cached canonical photo for "${speciesName}" -> /species/${filename}`);
           return `/species/${filename}`;
@@ -354,6 +360,7 @@ Respond with ONLY a valid JSON object matching this schema:
     auto_saved_to_db: autoSavedToDb,
     rationale: aiResult.description,
     image_url: finalImageUrl,
+    web_image_url: (typeof aiResult.image_url === 'string' && aiResult.image_url.startsWith('http')) ? aiResult.image_url : null,
     gemini_image_url: (typeof aiResult.image_url === 'string' && aiResult.image_url.startsWith('http')) ? aiResult.image_url : null,
     local_image_url: localCanonicalImageUrl || null,
     type: dbSpecies?.type || categoryType,

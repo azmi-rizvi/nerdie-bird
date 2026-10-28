@@ -112,7 +112,7 @@ function Identify() {
   }
 
   const speciesDisplayName = result ? (result.species_name || result.species) : "";
-  const rawReturnedImg = result ? (result.image_url || result.gemini_image_url || result.local_image_url) : null;
+  const rawReturnedImg = result ? (result.web_image_url || result.image_url || result.gemini_image_url || result.local_image_url) : null;
   const resultDisplayImg = rawReturnedImg
     ? (getSpeciesImageUrl(speciesDisplayName, rawReturnedImg) || rawReturnedImg)
     : (result ? getSpeciesImageUrl(speciesDisplayName) : mascot);
